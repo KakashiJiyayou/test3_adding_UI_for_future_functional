@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="db5b878f-2637-4420-845f-9ffd47a3048a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/module/test/data.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/module/test/directory_view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/app_sidebar.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/app_sidebar.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource.ui" beforeDir="false" afterPath="$PROJECT_DIR$/resource.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/base_ui.ui" beforeDir="false" afterPath="$PROJECT_DIR$/base_ui.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resource_ui2.py" beforeDir="false" afterPath="$PROJECT_DIR$/resource_ui2.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
