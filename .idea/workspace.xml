@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="db5b878f-2637-4420-845f-9ffd47a3048a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/base_ui.ui" beforeDir="false" afterPath="$PROJECT_DIR$/base_ui.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource_ui2.py" beforeDir="false" afterPath="$PROJECT_DIR$/resource_ui2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/base_ui_with_menu_buttons.ui" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/base_ui_with_search_header.ui" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/filter_data_from_excel.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/folder_path_key_list.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resource.ui" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resource_ui.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
