@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="db5b878f-2637-4420-845f-9ffd47a3048a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/base_ui_with_menu_buttons.ui" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/base_ui_with_search_header.ui" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/filter_data_from_excel.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/folder_path_key_list.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource.ui" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource_ui.py" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/DB/menu.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DB/menu_from_md.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,11 +27,12 @@
   <component name="ProjectId" id="2RW3USjqeDGev4cZd40jDTJyLSY" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../test" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Baidu_Pyqt5_Threading" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Project\Job\GQ\Python\Baidu_downlaod_upload\test3_adding_UI_for_future_functional\DB" />
       <recent name="E:\Project\Job\GQ\Python\Baidu_downlaod_upload\test3_adding_UI_for_future_functional\module\test" />
     </key>
   </component>
@@ -49,7 +48,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.adding_combobox">
+  <component name="RunManager" selected="Python.main">
     <configuration name="adding_combobox" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="app_sidebar" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -146,10 +145,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.adding_combobox" />
         <item itemvalue="Python.directory_view" />
         <item itemvalue="Python.dynamiccombobox" />
-        <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
