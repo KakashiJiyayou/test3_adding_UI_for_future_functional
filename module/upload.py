@@ -1,4 +1,5 @@
 import os
+import glob
 import time
 import _thread
 import zipfile
@@ -9,70 +10,61 @@ from pyunpack import Archive
 bp = ByPy()
 
 
-## SECTION - 
-_Widget_Text_Edit = None
-_Path = None
-##-*!SECTION - 
 
-
-## This is our initial method that will b
-def testing(self = None, value="None Given", widget_value = None):
-
-    # global variable so, it can be accessed
-    global _Widget_Text_Edit
-
-    # NOTE - initialize variables from main.py
-    _Widget_Text_Edit = widget_value
-
-
-    print ("Got Called")
-
-    # seperate proccess to upload file
-    # start_seperate_proccess(value)
-    # upload_to_baidu()
-
-
-
-
-
-
-
-
-## SECTION -  Below are methods that will be 
-#  Callded from the woker class method ------------------------------------------------------->
 def is_zip_file(path):
-    return zipfile.is_zipfile(path)
 
-##-*!SECTION ------------------------------------------------------------------------------/>
+    is_true = False
+    status = "Ok"
+
+    try:
+        is_true = zipfile.is_zipfile(path)
+    except:
+        status = "error"
+
+    return is_true
 
 
+def clear_temp_dir():
 
-## Will start a new proccess
-def start_seperate_proccess( value ):
-    # initialize thread
-     start_unzipping ( value )
+    clear_done = True
+    status = "ok"
+    try:
+        files = glob.glob('./module/temp')
+        for f in files:
+            os.remove(f)
+    except:
+        status = "Erorr removing contents"
+        clear_done = False
+    
+    json_value = { "clear_temp_dir": clear_done, "status":status }
+    return json_value
 
 
 ## Uploaded file will be Unzipped
-def start_unzipping(value):
+def start_unzipping(path):
+
+    unzipped = True
+    status = "ok"
     print("Value ",value)
 
-    # show hints
-    show_hints_by_print_to_the_widget( "Got the file location " + value + " will start unzipping  " )
+    try:
+        # prepare the uploaded file location 
+        value = r"" + value
+        Archive( value ).extractall('./module/temp')
+    except:
+        unzipped = False
+        status = "Could not unzipped"
 
-    # prepare the uploaded file location 
-    # value = r"" + value
-    # Archive( value ).extractall('./module/temp')
+    json_value = { "start_unzipping" : False, "status" : status }
 
-    # start to upload to baidu yun
-    return True
+    return json_value
+
+
+## 
 
 
 ## From temp folder uplaod directory to the Baidu YUn
 def upload_to_baidu():
-    # show hints
-    show_hints_by_print_to_the_widget( "Start uploading to Baidu pls wait..... " )
-
     bp.upload(r"E:\Project\Job\GQ\Python\Baidu_downlaod_upload\test3_adding_UI_for_future_functional\module\temp", "ONDUP")
     print(bp.list())   
 
@@ -81,9 +73,7 @@ def upload_to_baidu():
 """ ==========================START=============================== """
 """ COMMON METHODS to give data to the UI"""
 
-## This method will print data
-def show_hints_by_print_to_the_widget(text):
-    _Widget_Text_Edit.setText( text )
+
 
 
 """ ===========================END================================= """

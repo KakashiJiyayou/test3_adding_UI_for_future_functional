@@ -44,16 +44,16 @@ class MainWindow( QMainWindow ):
         #
         self.threadpool = QThreadPool()
 
-        # initial page menu setting
-        self.make_drop_down_menu()
-
         # getting ui elements
         self.scroll_content_0 = self.ui.scrollArea
-
         self.vbox_menu = QVBoxLayout()
         self.combo_box_list : QComboBox() = [] 
 
-        # print(type(self.combo_box_list), "sdf")
+        # initial methods
+        # initial page menu setting
+        self.make_drop_down_menu()
+
+        self.setting_up_app()
 
 
     ## Function For Searching
@@ -91,8 +91,9 @@ class MainWindow( QMainWindow ):
     def setting_up_app(self):
         
         # set QPushbutton( upload in first page ) text
-        pass
+        self.ui.pushButton.setText("Chose File")
 
+       
 
 
     ##----------------------------------------------------------------------------/>
@@ -123,6 +124,8 @@ class MainWindow( QMainWindow ):
     ## when click upload button --------------------------------------------------->
     def on_pushButton_pressed(self):
 
+        self.ui.pushButton.setDisabled ( True )
+
         # Open File Dialog
         fname = QFileDialog.getOpenFileName(self, "Open File", "", "All Files (*)" )
 		
@@ -147,12 +150,12 @@ class MainWindow( QMainWindow ):
         if (self.M_Uplaod.is_zip_file(file_path)):
             pass
 
-        for n in range(1,100):
-            value = "Checking file type for given '" + file_path + "' Pls Wait"
-            progress_callback.emit(value)
-            time.sleep(1)
+        # for n in range(1,100):
+        #     value = "Checking file type for given '" + file_path + "' Pls Wait"
+        #     progress_callback.emit(value)
+        #     time.sleep(1)
 
-        return "FInished"
+        return "Finished Uploading"
 
     ## show progress
     def show_progress(self, s):
@@ -425,9 +428,34 @@ class MainWindow( QMainWindow ):
     ## END----------------------------------------------------------------------------/>
     ## !SECTION MakeDrop Down Menu
 
+
+
+    ## SECTION - common methods for UI
+    ## --------------------------------------------------------------------------------->
+
+    def change_button_text( self, widget , text ):
+        widget.setText(text)
+
+
+    def change_button_state( self, widget, text ):
+        pass
+
+
+    # here state false means, disable
+    def enable_button( self,  widget, state ):
+
+        if not state:
+            widget.setDisabled()
+        else:
+            widget.setEnabled()
+
+    ## ---------------------------------------------------------------------------------/>
+    ## !SECTION
+
 """
  #NOTE END-Main Window---------------------------------Main Window------------------------------------------>      
 """
+
 
 
 
