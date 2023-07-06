@@ -212,7 +212,7 @@ class MainWindow( QMainWindow ):
         label.setText("Chose File" )
 
         combo = QComboBox(self)
-        combo.addItems(self.current_menu_list)
+        combo.addItems(self._initial_menu_list)
         combo.setCurrentIndex(-1)
 
         layout = QHBoxLayout()
@@ -311,7 +311,7 @@ class MainWindow( QMainWindow ):
                     self.add_children_menu_to_the_ui(temp_json)
 
                 except:
-                    path = self.first_key+ "." + str( self.combo_box_list[0].currentText())
+                    path = self._first_key+ "." + str( self.combo_box_list[0].currentText())
                 
                     for x in self.combo_box_list[1:]:
                         path +="." + str( x.currentText())
@@ -361,7 +361,7 @@ class MainWindow( QMainWindow ):
     # adding new value when combo box  is slected 
     # only call when user selected the current menu
     def update_menu_path(self):
-        self._selected_menu_json_path = self.first_key
+        self._selected_menu_json_path = self._first_key
         for item in self.combo_box_list:
             self._selected_menu_json_path += "." + item.currentText()
 
@@ -383,7 +383,7 @@ class MainWindow( QMainWindow ):
     # here one extra key always added from the begining
     # 
     def reset_selected_json_path( self, current_menu_index):
-        temp = self.first_key
+        temp = self._first_key
         for item in self.combo_box_list:
             temp += "." + item.currentText()
         self._selected_menu_json_path = temp
