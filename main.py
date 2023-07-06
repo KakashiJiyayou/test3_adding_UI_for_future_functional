@@ -29,14 +29,12 @@ class MainWindow( QMainWindow ):
         self.ui.home_btn_2.setChecked(1)
 
         # initialize variables
-        self.selected_menu_json_path = None
-        self.next_menu_list = None
-        self.prev_menu_list = None
-        self.menu_qcb_list_index = 0
-        self.current_menu_list = None
-        self.current_page_index = 0
+        # Variables with "_" prefix will be shared between pages
+        self._selected_menu_json_path = None
+        self._initial_menu_list = None
+        self._current_page_index = 0
         self._Menu_Json = None
-        self.first_key = ""
+        self._first_key = ""
 
         self.threadpool = QThreadPool()
 
@@ -58,7 +56,6 @@ class MainWindow( QMainWindow ):
         # print(type(self.combo_box_list), "sdf")
 
 
-
     ## Function For Searching
     def on_search_btn_clicked(self):
         self.ui.page_stackedWidget.setCurrentIndex(1)
@@ -74,6 +71,7 @@ class MainWindow( QMainWindow ):
     def on_user_btn_clicked(self):
         self.ui.page_stackedWidget.setCurrentIndex(6)
 
+
     ## Change QPushButton Checkable 
     ## Status When page_stackedWidget index changed
     def on_stackeWidget_currentChanged(self, index):
@@ -86,6 +84,20 @@ class MainWindow( QMainWindow ):
                 btn.setChecked(False)
             else:
                 btn.setAutoExclusive(True)
+
+
+    ## SECTION - Settign Up 
+    ## -------------------------------------------------------------------------->
+    def setting_up_app(self):
+        
+        # set QPushbutton( upload in first page ) text
+        pass
+
+
+
+    ##----------------------------------------------------------------------------/>
+    ## !SECTION
+
 
     ## SECTION - Pagination
     ## function for changing menu page ------------------------------------------->
@@ -102,8 +114,8 @@ class MainWindow( QMainWindow ):
     def on_dashboard_btn_2_toggled(self):   ## downlaod page
         self.ui.page_stackedWidget.setCurrentIndex(1)
 
-    #!SECTION - Pagination
     ##  ---------------------------------------------------------------------------/>
+    ## !SECTION - Pagination
 
 
 
@@ -154,11 +166,11 @@ class MainWindow( QMainWindow ):
     def thread_complete(self):
         print("Thread for uplaod done")
 
-    ## !SECTION worker methods for Upload 
     # END--------------------------------------------------------------------------/>
+    ## !SECTION worker methods for Upload 
 
-    ## !SECTION Upload Button
     ## END-------------------------------------------------------------------------/>
+    ## !SECTION Upload Button
 
 
 
@@ -176,7 +188,7 @@ class MainWindow( QMainWindow ):
         self.threadpool.start(worker)
 
         #NOTE - making menu path empty
-        self.selected_menu_json_path = ""
+        self._selected_menu_json_path = ""
         self.combo_box_list = []
 
 
@@ -186,12 +198,12 @@ class MainWindow( QMainWindow ):
         self._Menu_Json = Read_Write_Menu.get_json_for_menu ()
         progress_callback.emit ( "Reading done successfuly " )
 
-        self.first_key = list ( self._Menu_Json.keys() )[0]
+        self._first_key = list ( self._Menu_Json.keys() )[0]
 
-        self.current_menu_list = list (self.get_list_from_given_data(self._Menu_Json))
+        self._initial_menu_list = list (self.get_list_from_given_data(self._Menu_Json))
 
         # NOTE - setting initial menu path
-        self.selected_menu_json_path += self.first_key 
+        self._selected_menu_json_path += self._first_key 
 
 
 
@@ -221,91 +233,102 @@ class MainWindow( QMainWindow ):
 
         temp_lenght= len(self.combo_box_list)
 
-        # print("comobox list ", self.combo_box_list[temp_index])
-
         self.combo_box_list[ temp_lenght -1 ].activated[int].connect( 
-            partial(self.try_to_add_menu,   temp_lenght )) 
-        # combo.activated[int].connect( partial(self.try_to_add_menu,   temp_index )) 
-
-    def try_to_add_menu(self, temp_lenght):
+            partial(self.try_to_add_next_menu,   temp_lenght )) 
         
-        time.sleep(1)
-        # NOTE - setting menu path
-        value_chosen = self.combo_box_list[
-             temp_lenght -1 ].currentText()
-        self.selected_menu_json_path +="."+ value_chosen
+        
 
-        temp_path = self.selected_menu_json_path.split(".")
+    def try_to_add_next_menu(self, next_menu_index):
 
+        current_menu_text = ""
 
-        lenght = len(self.combo_box_list)
-        print("1 starting lenght ", lenght , " Temporary lenght ", temp_lenght)
+        try :
 
-        if( lenght > temp_lenght ):
-            print ("Combobox has children node , but previous " 
-                    "node changed...needd to change all childrens node from ", temp_lenght )
+            # If we are getting a value here, means user pressed a previous menu button
+            current_menu_text = self.combo_box_list[ next_menu_index ]
+
+            # index will be -1 
+            index = next_menu_index -1
+
+            # Based on current menu index we will do the deletion of menu
+            print(" Menu combo box selected is  ", index)
+
+            # We need to reset few thing:
+            #                        1.  selected_json_path
+            #                        2.  combox_list
+            #                        3.  VBOX_layout
+            #                        4.  Add value to last indexed list
+
+            # reset combo_list 
+            temp_combo_list = self.reset_combo_list(index)
+
+            # reset selected_json_path
+            temp_p = self.reset_selected_json_path(index) 
+
+            self.show_curren_selected_json_path("Try, where user previous click got clicked")
+
+            # reset VBOX layout 
+            self.reset_v_box_layout(self.vbox_menu, index)
+
+            # add values to the last indexed combo list 
+            self.reset_comboxes_item()
             
-            # self.vbox_menu.deleteLater()
-            # for i in reversed(range(self.vbox_menu.count())): 
+        except Exception as e:
+            print("Next Menu Does not exits or other problem" , e)
 
-            #     self.vbox_menu.itemAt(i).widget().deleteLater()
-            #     self.vbox_menu.itemAt(i).widget().setParent(None)
+            # lets check our menu list size
+            current_menu_size = len ( self.combo_box_list)
 
-            for i in reversed(range(self.vbox_menu.count())): 
+            # next menu list does not exist
+            # so lenght of  menu list will be same as next_menu_index
+            if( next_menu_index == current_menu_size):
+
+
+                #
+                #***Another scenerio where lenght and menu_index can be same 
+                # The JSON list is already at the end
+                # currently it's does not create any problem
+                # So we can let it be as it is
+
+                # NOTE - updating menu path 
+                self.update_menu_path()
+                 
+                # self.show_curren_selected_json_path("\\try_to_add_menu\\")
                 
-                if i >= temp_lenght :
-                    self.vbox_menu.itemAt(i).widget().deleteLater()
-                    self.vbox_menu.itemAt(i).widget().setParent(None)
-            total_combo_parent_widget = self.scroll_content_0.findChildren(QWidget)
+                #
+                # creating menu
+                # first create a list for current path
+                temp_path_list = self._selected_menu_json_path.split(".")
+
+
+                try:
+                    # The initial key is not present , we take it in advance
+                    temp_json = self._Menu_Json[temp_path_list[0]]
+
+                    # then based on current trail we will make new menu
+                    for last_key in temp_path_list[1:]:
+                        temp_json = temp_json [last_key]
+                    self.add_children_menu_to_the_ui(temp_json)
+
+                except:
+                    path = self.first_key+ "." + str( self.combo_box_list[0].currentText())
+                
+                    for x in self.combo_box_list[1:]:
+                        path +="." + str( x.currentText())
+                    self._selected_menu_json_path = path
+                    print("path for ", self._selected_menu_json_path)
             
-            # print(" Has total comboboxes of ",len( total_combo_parent_widget))
-            self.combo_box_list = self.combo_box_list[0:temp_lenght ]
 
-            temp_json_path_list  = self.selected_menu_json_path.split(".")
+            #  
+            # Now maybe user clicked Menu which is not last branch
+            # let we need to check if selected JSON menu has more list
+            # Even we do not check it will work
+            else:
+                print("we are here exception did not handle some issues"  )
 
-            temp_json_path_list = temp_json_path_list[:temp_lenght]
-
-            print ("Path after cut ", temp_json_path_list)
-
-            string= "" + temp_json_path_list[0]
-            if( temp_lenght > 1):
-                for x_temp_j in temp_json_path_list[1:]:
-                    string += "." + x_temp_j
-
-            
-            self.selected_menu_json_path = string+"." + self.combo_box_list[temp_lenght-1].currentText()
-
-            print("Slected json  menu path ",  self.selected_menu_json_path , " combo_box_lenght ", len(self.combo_box_list))
-           
-            
-            self.try_to_add_menu(len(self.combo_box_list))
-            
-        elif ( lenght == temp_lenght ):
-            print(" Jtemp path  ", temp_path)
-
-            try:
-
-                temp_json = self._Menu_Json[temp_path[0]]
-                for last_key in temp_path[1:]:
-                    temp_json = temp_json [last_key]
-                self.add_children_menu_to_the_ui(temp_json)
-            except:
-                path = self.first_key+ "." + str( self.combo_box_list[0].currentText())
-              
-                for x in self.combo_box_list[1:]:
-                    path +="." + str( x.currentText())
-                self.selected_menu_json_path = path
-                print("path for ", self.selected_menu_json_path)
-        
-        
-        print("2 starting lenght ", lenght , " Temporary lenght ", temp_lenght)
-
-    def get_list_from_given_data(self, value ) :
-        key = list(value.keys())[0]
-        return value[key].keys()
+       
 
 
-    
 
     def add_children_menu_to_the_ui(self, item):
        
@@ -325,17 +348,82 @@ class MainWindow( QMainWindow ):
         self.combo_box_list.append(combo)
 
         temp_lenght= len(self.combo_box_list)
-
-     
-
       
-        self.combo_box_list[ temp_lenght -1 ].activated[int].connect(partial(self.try_to_add_menu,   temp_lenght ))
+        self.combo_box_list[ temp_lenght -1 ].activated[int].connect(partial(self.try_to_add_next_menu,   temp_lenght ))
 
-        print("path " , self.selected_menu_json_path)
+        self.show_curren_selected_json_path("\\add_children_menu_to_the_ui\\")
+
+
+    def get_list_from_given_data(self, value ) :
+        key = list(value.keys())[0]
+        return value[key].keys()
+
+    # adding new value when combo box  is slected 
+    # only call when user selected the current menu
+    def update_menu_path(self):
+        self._selected_menu_json_path = self.first_key
+        for item in self.combo_box_list:
+            self._selected_menu_json_path += "." + item.currentText()
+
+
+    # reseting combo list
+    # we will get index of curent selected menu 
+    # need to add 1, 
+    # which  means from 0th positon, 
+    # we will take n(index)th number of element
+    def reset_combo_list( self, index ):
+        self.combo_box_list = self.combo_box_list[ 0 : index + 2 ]
+
+        self.combo_box_list[-1].clear()
         
+        return self._selected_menu_json_path
 
-    ##!SECTION MakeDrop Down Menu
-    # END----------------------------------------------------------------------------/>
+
+    # reset selected_json_path
+    # here one extra key always added from the begining
+    # 
+    def reset_selected_json_path( self, current_menu_index):
+        temp = self.first_key
+        for item in self.combo_box_list:
+            temp += "." + item.currentText()
+        self._selected_menu_json_path = temp
+
+        return temp
+
+
+    # resetting Vbox layout
+    def reset_v_box_layout( self,layout, index ):
+        index = index + 2
+        for i in reversed( range( layout.count() ) ): 
+            if i >= index :
+                layout.itemAt( i ).widget().deleteLater()
+                layout.itemAt( i ).widget().setParent(None)
+
+    # reseting comboboxes items at -1th position
+    def reset_comboxes_item( self ):
+        temp_json = self._Menu_Json[ self._first_key ] 
+        for item in self.combo_box_list:
+            if item.currentText():
+                # print("Comboxes text ", item.currentText() )
+                temp_json = temp_json[ item.currentText() ]
+                pass
+            else :
+                print( "Curent index does not have text, so will add these \n\t\t ",
+                      " ", temp_json.keys() )
+                
+                new_list = list ( temp_json.keys() )
+                self.combo_box_list[-1].addItems(new_list)
+                self.combo_box_list[-1].setCurrentIndex(-1)
+
+    
+
+
+    def show_curren_selected_json_path(self, from_where=None):
+        print("Path " , self._selected_menu_json_path , "   From ", from_where 
+              , "\t lenght of current menu list ", len(self.combo_box_list))
+        
+    ## END----------------------------------------------------------------------------/>
+    ## !SECTION MakeDrop Down Menu
 
 """
  #NOTE END-Main Window---------------------------------Main Window------------------------------------------>      
