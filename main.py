@@ -2,8 +2,9 @@ import  sys
 from PyQt5.QtWidgets import  *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from resource_ui2 import Ui_MainWindow
 from functools import partial
+from resource_ui2 import Ui_MainWindow
+import traceback
 
 import time
 import json
@@ -21,7 +22,6 @@ class MainWindow( QMainWindow ):
     ## Initial Function
     def __init__(self):
         super(MainWindow, self).__init__()
-
         self.ui     =   Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.icon_only_widget.hide()
@@ -35,6 +35,7 @@ class MainWindow( QMainWindow ):
         self._current_page_index = 0
         self._Menu_Json = None
         self._first_key = ""
+        self._folder_chosen = True
 
         self.threadpool = QThreadPool()
 
@@ -122,24 +123,85 @@ class MainWindow( QMainWindow ):
 
     ## SECTION - UPLOAD button pressed
     ## when click upload button --------------------------------------------------->
-    def on_pushButton_pressed(self):
-
+    def on_pushButton_pressed( self ):
+        # disble upload button 
         self.ui.pushButton.setDisabled ( True )
 
+        # 
+        self.show_dialog_chosing_file()
+        
+
+    ## NOTE - show dialog box
+    # 
+    def show_dialog_chosing_file( self ): 
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Opening File")
+        dlg.setText("Here chose wheter to chose directory or" +
+                     " Just want to open file (.zip, .png, .jpg etc...) ")
+        
+        # setting buttons for dialog
+        # dlg.setStandardButtons(QMessageBox.Yes| QMessageBox.No)
+        chose_folder = QPushButton()
+        chose_file  = QPushButton()
+        chose_folder.setText( "Chose Folder" )
+        chose_file.setText(" Chose File" )
+        chose_folder.clicked.connect(  self.folder_chosen )
+        chose_file.clicked.connect(  self.file_chosen )
+        dlg.addButton( chose_folder, QMessageBox.YesRole )
+        dlg.addButton( chose_file, QMessageBox.NoRole )
+        # dlg.setStandardButtons (  )
+        dlg.setIcon(QMessageBox.Question)
+        dlg.exec()
+
+
+    ##
+    def folder_chosen(self):
+        self._folder_chosen = True
+        self.start_chosing()
+
+    ##
+    def file_chosen(self):
+        self._folder_chosen = False
+        self.start_chosing()
+
+    ##
+    ## Here we will start threadpool and other part
+    def start_chosing(self):
+
+        if self._folder_chosen:
+            fname = QFileDialog.getExistingDirectory(self, 'Select Folder')
+        else:
+            fname = QFileDialog.getOpenFileName(self, "Select file", "", "All Files (*)" )
+            
+
         # Open File Dialog
-        fname = QFileDialog.getOpenFileName(self, "Open File", "", "All Files (*)" )
+        # fname = QFileDialog.getOpenFileName(self, "Select Folder", "", "All Files (*)" )
 		
 		# Output filename to screen and pass it to upload module
         if fname:
-            file_path   =   fname[0]
+            if self._folder_chosen:
+                file_path   =   fname
+            else:
+                file_path = fname[0]
             print( " File selected ", file_path )
 
-            worker = WorkQT.Worker(self.ongoing_proccess , file_path)
-            worker.signals.progress.connect(self.show_progress)
-            worker.signals.result.connect(self.show_result)
-            worker.signals.finished.connect(self.show_progress)
+            # worker = WorkQT.Worker(self.ongoing_proccess , file_path)
+            # worker.signals.progress.connect(self.show_progress)
+            # worker.signals.result.connect(self.show_result)
+            # worker.signals.finished.connect(self.show_progress)
 
-            self.threadpool.start(worker)
+            # self.threadpool.start(worker)
+
+            # test method for uplaod
+            self.test(file_path)
+
+
+    ## Test methods for uplaod
+    ##
+    def test( self, path ):
+
+        print ( "Is zip file ", M_upload.is_zip_file( path ) )
+        print ( "List of directorries ", M_upload.get_folder_list() )
 
     
     ## SECTION  WORKER Class method For Upload
@@ -265,6 +327,9 @@ class MainWindow( QMainWindow ):
             # reset combo_list 
             temp_combo_list = self.reset_combo_list(index)
 
+            # add values to the last indexed combo list 
+            self.reset_comboxes_item()
+
             # reset selected_json_path
             temp_p = self.reset_selected_json_path(index) 
 
@@ -273,11 +338,11 @@ class MainWindow( QMainWindow ):
             # reset VBOX layout 
             self.reset_v_box_layout(self.vbox_menu, index)
 
-            # add values to the last indexed combo list 
-            self.reset_comboxes_item()
+           
             
         except Exception as e:
             print("Next Menu Does not exits or other problem" , e)
+            print(traceback.format_exc())
 
             # lets check our menu list size
             current_menu_size = len ( self.combo_box_list)
@@ -374,7 +439,12 @@ class MainWindow( QMainWindow ):
     # need to add 1, 
     # which  means from 0th positon, 
     # we will take n(index)th number of element
+    # we need to check, the "KEY" has list or not
     def reset_combo_list( self, index ):
+
+        add_item = 1
+
+        # before adding two lets confirm, the current menu has submen or not
         self.combo_box_list = self.combo_box_list[ 0 : index + 2 ]
 
         self.combo_box_list[-1].clear()
@@ -396,30 +466,59 @@ class MainWindow( QMainWindow ):
 
     # resetting Vbox layout
     def reset_v_box_layout( self,layout, index ):
-        index = index + 2
+        print ("Vbox count ", layout.count() , " len of combo boxes ", len(self.combo_box_list))
+        
         for i in reversed( range( layout.count() ) ): 
-            if i >= index :
+                if layout.count() <= len(self.combo_box_list):
+                    break
                 layout.itemAt( i ).widget().deleteLater()
                 layout.itemAt( i ).widget().setParent(None)
+                
+
+
 
     # reseting comboboxes items at -1th position
-    def reset_comboxes_item( self ):
+    def reset_comboxes_item( self  ):
+
+        i = 0
         temp_json = self._Menu_Json[ self._first_key ] 
+
         for item in self.combo_box_list:
             if item.currentText():
-                # print("Comboxes text ", item.currentText() )
+                print("Comboxes text ", item.currentText() )
                 temp_json = temp_json[ item.currentText() ]
                 pass
             else :
-                print( "Curent index does not have text, so will add these \n\t\t ",
-                      " ", temp_json.keys() )
-                
-                new_list = list ( temp_json.keys() )
-                self.combo_box_list[-1].addItems(new_list)
-                self.combo_box_list[-1].setCurrentIndex(-1)
+                if isinstance(temp_json, dict ): 
+                    print( "Curent index does not have text, so will add dic \n\t\t ",
+                        " ", temp_json.keys() )
+                    
+                    new_list = list ( temp_json.keys() )
+                    self.combo_box_list[-1].addItems(new_list)
+                    self.combo_box_list[-1].setCurrentIndex(-1)
+                elif isinstance( temp_json, str ):
+                    print( "Curent index does not have text, so will add str \n\t\t ",
+                        " ", temp_json, "\t size", len(temp_json)  )
+                    
+                    self.combo_box_list[-1].addItem(temp_json)
+                    self.combo_box_list[-1].setCurrentIndex(-1)
+
+                    if (len (temp_json) == 0 ):
+                        print (" Size of list ", len (self.combo_box_list) )
+                        self.combo_box_list = self.combo_box_list[:-1]
+                        print("poping list ")
+                        print (" Size of list ", len (self.combo_box_list) )
+
+                elif isinstance( temp_json, list ):
+                    print( "Curent index does not have text, so will add list \n\t\t ",
+                        " ", temp_json )
+                    self.combo_box_list[-1].addItems(temp_json)
+                    self.combo_box_list[-1].setCurrentIndex(-1)
 
     
-
+    # chec selected menu has sub menu or not
+    def selected_has_sub_menu(self, text, index):
+        temp_json = self._Menu_Json[ self._first_key ] 
 
     def show_curren_selected_json_path(self, from_where=None):
         print("Path " , self._selected_menu_json_path , "   From ", from_where 
