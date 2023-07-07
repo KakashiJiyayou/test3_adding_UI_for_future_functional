@@ -116,13 +116,14 @@ class MainWindow( QMainWindow ):
     def on_dashboard_btn_2_toggled(self):   ## downlaod page
         self.ui.page_stackedWidget.setCurrentIndex(1)
 
-    ##  ---------------------------------------------------------------------------/>
+    ##  --------------------------------------------------------------------------/>
     ## !SECTION - Pagination
 
 
 
     ## SECTION - UPLOAD button pressed
     ## when click upload button --------------------------------------------------->
+
     def on_pushButton_pressed( self ):
         # disble upload button 
         self.ui.pushButton.setDisabled ( True )
@@ -200,8 +201,29 @@ class MainWindow( QMainWindow ):
     ##
     def test( self, path ):
 
-        print ( "Is zip file ", M_upload.is_zip_file( path ) )
-        print ( "List of directorries ", M_upload.get_folder_list() )
+        # clearing temp folder
+        clear_dir = M_upload.clear_temp_dir() 
+        print ( "clear_dir ", clear_dir["clear_temp_dir"] )
+
+        # checking giving path belongs to a zip
+        is_zip_file = M_upload.is_zip_file( path )
+        if is_zip_file :
+
+            # unzip
+            result = M_upload.start_unzipping ( path )
+
+            # if unzip succesfull
+            if result[ "start_unzipping" ]:
+                print ( "Unzipped , will uplaod to baidu ")
+
+        folder_list = M_upload.get_folder_list() 
+
+
+        # print ( "Is zip file ", M_upload.is_zip_file( path ) )
+        print ( "List of directorries ", folder_list )
+        # print ( " Clear temp folder ", M_upload.clear_temp_dir() )
+
+
 
     
     ## SECTION  WORKER Class method For Upload

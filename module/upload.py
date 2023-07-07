@@ -3,14 +3,14 @@ import glob
 import time
 import shutil
 import _thread
-import zipfile
+from zipfile import ZipFile
 from bypy import ByPy
 from pyunpack import Archive
 
 
 bp = ByPy()
 
-
+path_list = []
 
 def is_zip_file(path):
 
@@ -18,9 +18,10 @@ def is_zip_file(path):
     status = "Ok"
 
     try:
-        is_true = zipfile.is_zipfile(path)
+        is_true = ".zip" in str(path)
     except:
         status = "error"
+        is_true = False
 
     return is_true
 
@@ -47,36 +48,55 @@ def clear_temp_dir():
 
 
 ## Uploaded file will be Unzipped
-def start_unzipping(path):
+def start_unzipping( path ):
 
     unzipped = True
     status = "ok"
-    print("Value ",value)
+    print( "Value ",path )
 
     try:
         # prepare the uploaded file location 
-        value = r"" + value
-        Archive( value ).extractall('./module/temp')
+        value = r"" + path
+        # with ZipFile ( value, "r" ) as zObj:
+        #     zObj.extractall ( path= './module/temp'  )
+        Archive( path ).extractall( './module/temp' )
     except:
         unzipped = False
         status = "Could not unzipped"
 
-    json_value = { "start_unzipping" : False, "status" : status }
+    json_value = { "start_unzipping" : unzipped , "status" : status }
 
     return json_value
 
 
 ## get folder list as JSON
 def get_folder_list():
-    path_list = os.listdir( get_directory_path() )
-
+    global path_list
+    path_list = []
+    folder_list()
     return path_list
+    
 
+def folder_list( rootDir = None ):
+    global path_list
+    if rootDir is  None:
+        rootDir =  get_directory_path() 
+
+    for lists in os.listdir( rootDir ):
+        path_list.append( lists )
+        print ( "From upload module path ", lists )
+        p = os.path.join( rootDir, lists)
+
+        if os.path.isdir( p ):
+            folder_list( p )
 
 
 ## From temp folder uplaod directory to the Baidu YUn
 def upload_to_baidu():
-    bp.upload(r"E:\Project\Job\GQ\Python\Baidu_downlaod_upload\test3_adding_UI_for_future_functional\module\temp", "ONDUP")
+    rootDir = get_directory_path()
+    folder_name = os.listdir ( rootDir )[0]
+    path = r""+ os.path.join( rootDir, folder_name )
+    bp.upload( path, "ONDUP" )
     print(bp.list())   
 
 
@@ -88,7 +108,7 @@ def get_directory_path():
     
     # add folder path to the working dire
     # y
-    path = cwd + "/module/temp"
+    path = cwd + "/temp"
     return path
 
 
