@@ -80,13 +80,18 @@ def get_folder_list():
 
 def folder_list( rootDir = None ):
     global path_list
+
+    delete_rootDir = get_directory_path() 
     if rootDir is  None:
         rootDir =  get_directory_path() 
+        delete_rootDir = rootDir
 
     for lists in os.listdir( rootDir ):
-        path_list.append( lists )
+        
         print ( "From upload module path ", lists )
         p = os.path.join( rootDir, lists)
+
+        path_list.append( p.replace( delete_rootDir , "" ) )
 
         if os.path.isdir( p ):
             folder_list( p )
@@ -95,9 +100,10 @@ def folder_list( rootDir = None ):
 ## From temp folder uplaod directory to the Baidu YUn
 def upload_to_baidu():
     rootDir = get_directory_path()
-    folder_name = os.listdir ( rootDir )[0]
-    path = r""+ os.path.join( rootDir, folder_name )
-    bp.upload( path, "ONDUP" )
+    # folder_name = os.listdir ( rootDir )[0]
+    # path = r""+ os.path.join( rootDir, folder_name )
+    bp.upload( rootDir, "ONDUP" )
+
     print(bp.list())   
 
 

@@ -10,8 +10,10 @@ import time
 import json
 import traceback, sys
 
+
 from module import upload as M_upload
 from module import worker_pyqt as WorkQT
+from module import  database as Database
 from module import Create_Menu_From_MD as Read_Write_Menu 
 
 """
@@ -186,24 +188,25 @@ class MainWindow( QMainWindow ):
                 file_path = fname[0]
             print( " File selected ", file_path )
 
-            # worker = WorkQT.Worker(self.ongoing_proccess , file_path)
-            # worker.signals.progress.connect(self.show_progress)
-            # worker.signals.result.connect(self.show_result)
-            # worker.signals.finished.connect(self.show_progress)
+            worker = WorkQT.Worker(self.test , file_path)
+            worker.signals.progress.connect(self.show_progress)
+            worker.signals.result.connect(self.show_result)
+            worker.signals.finished.connect(self.thread_complete)
 
-            # self.threadpool.start(worker)
+            self.threadpool.start(worker)
 
             # test method for uplaod
-            self.test(file_path)
+            # self.test(file_path)
 
 
     ## Test methods for uplaod
     ##
-    def test( self, path ):
+    def test( self, path , progress_callback ):
 
         # clearing temp folder
         clear_dir = M_upload.clear_temp_dir() 
         print ( "clear_dir ", clear_dir["clear_temp_dir"] )
+        progress_callback.emit ( "clear_dir"  )
 
         # checking giving path belongs to a zip
         is_zip_file = M_upload.is_zip_file( path )
@@ -215,13 +218,23 @@ class MainWindow( QMainWindow ):
             # if unzip succesfull
             if result[ "start_unzipping" ]:
                 print ( "Unzipped , will uplaod to baidu ")
+        progress_callback.emit( "Unzipped" )
 
+        # getting the list
         folder_list = M_upload.get_folder_list() 
-
-
         # print ( "Is zip file ", M_upload.is_zip_file( path ) )
         print ( "List of directorries ", folder_list )
-        # print ( " Clear temp folder ", M_upload.clear_temp_dir() )
+
+        # upload to baidu
+        progress_callback.emit( "uploading to baidu" )
+        M_upload.upload_to_baidu()
+        progress_callback.emit( "uploading to baidu is done" )
+        
+
+        print ( " Clear temp folder ", M_upload.clear_temp_dir() )
+
+        insert_result = Database.insert_dir_list ( folder_list )
+        print ( "DB insert result" , insert_result )
 
 
 
@@ -246,12 +259,14 @@ class MainWindow( QMainWindow ):
         print(s)
 
     ## result
-    def show_result(self,s):
+    def show_result(self, s):
         print("Showing resutl done for this even ",s)
 
     ## thread complete
     def thread_complete(self):
         print("Thread for uplaod done")
+
+
 
     # END--------------------------------------------------------------------------/>
     ## !SECTION worker methods for Upload 
