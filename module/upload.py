@@ -59,6 +59,7 @@ def start_unzipping( path ):
         value = r"" + path
         # with ZipFile ( value, "r" ) as zObj:
         #     zObj.extractall ( path= './module/temp'  )
+        
         Archive( path ).extractall( './module/temp' )
     except:
         unzipped = False
@@ -108,7 +109,7 @@ def get_directory_path():
     
     # add folder path to the working dire
     # y
-    path = cwd + "/temp"
+    path =  os.path.join ( cwd , "temp")
     return path
 
 
