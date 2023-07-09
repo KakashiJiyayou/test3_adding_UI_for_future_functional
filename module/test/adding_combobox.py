@@ -26,8 +26,39 @@ class MainWindow( QMainWindow):
         # self.addingComboboxAndLabel()
         self.addingComboboxAndLabel2()
         self.addingComboboxAndLabel3()
-        self.search_functionalities()
         self.showProgress()
+
+        self.path_list = ['/软件编制 资料', '/软件编制 资料/技术文件', '/软件编制 资料/技术文件/组织安全方案.doc',
+                          '/软件编制 资料/技术文件/管道养护文件40页.doc', '/软件编制 资料/技术文件/管道养护标 应急预案.doc',
+                          '/软件编制 资料/技术文件/CCTV检测文件5页.doc', '/软件编制 资料/技术文件/环境方案.doc',
+                          '/软件编制 资料/技术文件/管道修复文件20页.doc', '/软件编制 资料/技术文件/管道检测标应急预案.doc',
+                          '/软件编制 资料/技术文件/CCTV检测技术文件10页.doc', '/软件编制 资料/业绩合同',
+                          '/软件编制 资料/业绩合同/管道检测修复项目50万.doc', '/软件编制 资料/业绩合同/排水公司疏通检测项目20万.doc',
+                          '/软件编制 资料/业绩合同/舟山市污水零直排项目100万.doc', '/软件编制 资料/业绩合同/管道检测项目.doc',
+                          '/软件编制 资料/业绩合同/DG225销售合同【上海金佳】.doc', '/软件编制 资料/业绩合同/崇仁镇污水零直排项目3万.doc',
+                          '/软件编制 资料/软件 编制(1).ppt', '/软件编制 资料/公司证件', '/软件编制 资料/公司证件/市政三级环保三级.doc',
+                          '/软件编制 资料/公司证件/ISO环境证书2021-2023年.doc', '/软件编制 资料/公司证件/健康环境证书2021-2023.8月.doc',
+                          '/软件编制 资料/公司证件/安全许可证.doc', '/软件编制 资料/公司证件/重信用证书.doc',
+                          '/软件编制 资料/公司证件/公司营业执照.doc', '/软件编制 资料/公司证件/生产环境体系证书2021.2-2024.1.doc',
+                          '/软件编制 资料/发票设备', '/软件编制 资料/发票设备/检测机器人3【0003849】.doc',
+                          '/软件编制 资料/发票设备/QV设备15套.doc', '/软件编制 资料/发票设备/箱式车辆【000】.doc',
+                          '/软件编制 资料/发票设备/毒气检测仪5套【089812】.doc', '/软件编制 资料/发票设备/毒气检测仪3套【09123】.doc',
+                          '/软件编制 资料/发票设备/箱式车辆【0001】.doc', '/软件编制 资料/发票设备/疏通车辆【浙B0lmt】.doc',
+                          '/软件编制 资料/发票设备/疏通车辆 【浙B0MET].doc', '/软件编制 资料/发票设备/检测机器人5【0012342】.doc',
+                          '/软件编制 资料/发票设备/检测机器人2个【009878】.doc', '/软件编制 资料/发票设备/管道机器人5套【123401】.doc',
+                          '/软件编制 资料/发票设备/正压式呼吸器4个.doc', '/软件编制 资料/人员证书',
+                          '/软件编制 资料/人员证书/安全员谢嘉.doc', '/软件编制 资料/人员证书/安全员于娜.doc',
+                          '/软件编制 资料/人员证书/环境工程师张明华.doc', '/软件编制 资料/人员证书/CCTV检测员王超.doc',
+                          '/软件编制 资料/人员证书/二级建造师王占生.doc', '/软件编制 资料/人员证书/环境工程师谢嘉.doc',
+                          '/软件编制 资料/人员证书/潜水员谢生.doc', '/软件编制 资料/人员证书/养护工谢林.doc',
+                          '/软件编制 资料/人员证书/安全员张春梅.doc', '/软件编制 资料/人员证书/养护工林涛.doc',
+                          '/软件编制 资料/人员证书/CCTV检测员赵红好.doc', '/软件编制 资料/人员证书/CCTV检测员周浩.doc',
+                          '/软件编制 资料/人员证书/养护工张明华.doc', '/软件编制 资料/标书导图1.emmx',
+                          '/软件编制 资料/rwqr.docx', '/chat', '/chat/chat.wxml', '/chat/chat.js', '/chat/chat.json',
+                          '/chat/chat.wxss', '/root', '/root/server', '/root/server/public', '/root/server/public/admin']
+
+        self.search_functionalities()
+
 
     def addingComboboxAndLabel(self):
         ## create vertical layout
@@ -125,7 +156,8 @@ class MainWindow( QMainWindow):
 
         words_list = self.data.keys()
 
-        completer = QCompleter(words_list)
+        # completer = QCompleter(words_list)
+        completer  = QCompleter ( self.path_list )
         self.ui.search_input.setCompleter(completer)
 
     def showProgress(self):

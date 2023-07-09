@@ -69,15 +69,17 @@ def get_dir_list():
     result = None
     try :
         result = [ item.get( "path" ) for item in dir_list_table.search ( path_list.path.exists ( ) ) ]
+        temp_result = result
+        result = []
+        for item in temp_result:
+            temp_str_list = item.split("/")
+            last_str = temp_str_list[-1]
+            temp_value = last_str + "  Directory:" + item
+            result.append(temp_value)
     except Exception as e:
         print( traceback.format_exc() )
 
-    temp_result = result
-    for item in result:
-        temp_str_list = item.split( "/" )
-        last_str = temp_str_list[-1]
-        temp_value = last_str + "<==>" + item
-        result.append ( temp_value )
+
 
     
     return result

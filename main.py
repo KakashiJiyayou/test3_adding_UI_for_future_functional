@@ -98,6 +98,12 @@ class MainWindow( QMainWindow ):
         # set QPushbutton( upload in first page ) text
         self.ui.pushButton.setText("Chose File")
 
+        # set up for search completer
+        self.searh_completer = QCompleter ( self._search_path_list )
+        # completer.setCaseSensitivity(0)
+
+        self.ui.search_input.setCompleter ( self.searh_completer )
+
        
 
 
@@ -572,13 +578,13 @@ class MainWindow( QMainWindow ):
     # This method will take value for "self._search_path_list"
     # It will just add them to the completer
     def update_search_path( self ):
-        completer = QCompleter ( self._search_path_list )
+        model = self.searh_completer.model ()
+        model.setStringList( self._search_path_list)
+        print ("Search completer updated ")
         
-        self.ui.search_input.setCompleter ( completer )
-        pass
 
     # get search list from 
-    def get_search_path_list_from_db ( self ):
+    def get_search_path_list_from_db ( self, progress_callback ):
 
         # Comobox nth menu for now by deafult None
         # if loop through all menu return no text , it will be none
@@ -597,13 +603,17 @@ class MainWindow( QMainWindow ):
         # put the list in self._search_path_list
         self._search_path_list = result_list
 
+        print ("Now update the completer")
+        self.update_search_path()
+
 
 
     def on_search_input_textChanged ( self ):
-        self.get_search_path_list_from_db ()
 
-        print ("Now update the search completer")
-        self.update_search_path ()
+        worker = WorkQT.Worker ( self.get_search_path_list_from_db )
+
+        self.threadpool.start ( worker )
+
     
 
     #  -------------------------------------------------------------------------------/>
