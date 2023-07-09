@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from functools import partial
 from resource_ui2 import Ui_MainWindow
-import traceback
+
 
 import time
 import json
@@ -572,6 +572,9 @@ class MainWindow( QMainWindow ):
     # This method will take value for "self._search_path_list"
     # It will just add them to the completer
     def update_search_path( self ):
+        completer = QCompleter ( self._search_path_list )
+        
+        self.ui.search_input.setCompleter ( completer )
         pass
 
     # get search list from 
@@ -582,16 +585,25 @@ class MainWindow( QMainWindow ):
         # we will get from another method
         filter_json = None
         # for i in range ( 0, 4):
-        #     filter_json = {  }
+        #     filter_list = []
 
         # Try to get text from search
         searc_txt = self.ui.search_input
 
         # call database to get data on this 
+        result_list = Database.get_dir_list()
+        print ( result_list )
+
+        # put the list in self._search_path_list
+        self._search_path_list = result_list
+
 
 
     def on_search_input_textChanged ( self ):
         self.get_search_path_list_from_db ()
+
+        print ("Now update the search completer")
+        self.update_search_path ()
     
 
     #  -------------------------------------------------------------------------------/>

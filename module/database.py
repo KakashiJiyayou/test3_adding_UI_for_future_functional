@@ -1,5 +1,7 @@
 import datetime
+import traceback
 from tinydb import TinyDB, Query
+
 
 
 
@@ -58,7 +60,29 @@ def insert_dir_list( list ):
 
 
 # Query data
-def 
+# NOTE - its for search completer 
+# Later we can pass value with menu filter 
+def get_dir_list():
+    global dir_list_table
+
+    path_list = Query()
+    result = None
+    try :
+        result = [ item.get( "path" ) for item in dir_list_table.search ( path_list.path.exists ( ) ) ]
+    except Exception as e:
+        print( traceback.format_exc() )
+
+    temp_result = result
+    for item in result:
+        temp_str_list = item.split( "/" )
+        last_str = temp_str_list[-1]
+        temp_value = last_str + "<==>" + item
+        result.append ( temp_value )
+
+    
+    return result
+
+        
 
 # !SECTION
 
