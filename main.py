@@ -39,6 +39,8 @@ class MainWindow( QMainWindow ):
         self._first_key = ""
         self._folder_chosen = True
 
+        self._search_path_list = []
+
         self.threadpool = QThreadPool()
 
         # initialize some module value
@@ -236,6 +238,9 @@ class MainWindow( QMainWindow ):
         insert_result = Database.insert_dir_list ( folder_list )
         print ( "DB insert result" , insert_result )
 
+        # enable upload button
+        self.ui.pushButton.setEnabled(True)
+
 
 
     
@@ -270,6 +275,8 @@ class MainWindow( QMainWindow ):
 
     # END--------------------------------------------------------------------------/>
     ## !SECTION worker methods for Upload 
+
+
 
     ## END-------------------------------------------------------------------------/>
     ## !SECTION Upload Button
@@ -308,7 +315,6 @@ class MainWindow( QMainWindow ):
         self._selected_menu_json_path += self._first_key 
 
 
-
     def result_for_initial_menu_creation(self, s):
         label = QLabel(self)
         label.setText("Chose File" )
@@ -339,7 +345,6 @@ class MainWindow( QMainWindow ):
             partial(self.try_to_add_next_menu,   temp_lenght )) 
         
         
-
     def try_to_add_next_menu(self, next_menu_index):
 
         current_menu_text = ""
@@ -431,9 +436,6 @@ class MainWindow( QMainWindow ):
             else:
                 print("we are here exception did not handle some issues"  )
 
-       
-
-
 
     def add_children_menu_to_the_ui(self, item):
        
@@ -462,6 +464,7 @@ class MainWindow( QMainWindow ):
     def get_list_from_given_data(self, value ) :
         key = list(value.keys())[0]
         return value[key].keys()
+
 
     # adding new value when combo box  is slected 
     # only call when user selected the current menu
@@ -512,8 +515,6 @@ class MainWindow( QMainWindow ):
                 layout.itemAt( i ).widget().setParent(None)
                 
 
-
-
     # reseting comboboxes items at -1th position
     def reset_comboxes_item( self  ):
 
@@ -563,6 +564,38 @@ class MainWindow( QMainWindow ):
         
     ## END----------------------------------------------------------------------------/>
     ## !SECTION MakeDrop Down Menu
+
+
+    ## SECTION Search Result 
+    #  -------------------------------------------------------------------------------->
+    # Update search path list
+    # This method will take value for "self._search_path_list"
+    # It will just add them to the completer
+    def update_search_path( self ):
+        pass
+
+    # get search list from 
+    def get_search_path_list_from_db ( self ):
+
+        # Comobox nth menu for now by deafult None
+        # if loop through all menu return no text , it will be none
+        # we will get from another method
+        filter_json = None
+        # for i in range ( 0, 4):
+        #     filter_json = {  }
+
+        # Try to get text from search
+        searc_txt = self.ui.search_input
+
+        # call database to get data on this 
+
+
+    def on_search_input_textChanged ( self ):
+        self.get_search_path_list_from_db ()
+    
+
+    #  -------------------------------------------------------------------------------/>
+    ## !SECTION
 
 
 

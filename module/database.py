@@ -16,6 +16,7 @@ dir_list_table  = db.table( 'dir_list' )
 
 
 # insert value to the 'dir_list'
+# NOTE - for inserting 
 def insert_dir_list( list ):
     global dir_list_table
 
@@ -54,6 +55,10 @@ def insert_dir_list( list ):
 
     value = { "insert_done": insert_done, "status": status }
     return value
+
+
+# Query data
+def 
 
 # !SECTION
 
