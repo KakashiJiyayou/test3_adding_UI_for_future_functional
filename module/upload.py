@@ -97,6 +97,7 @@ def folder_list( rootDir = None ):
             folder_list( p )
 
 
+#FIXME -  - we will use subproccess to do this, we willnot be using this one
 ## From temp folder uplaod directory to the Baidu YUn
 def upload_to_baidu():
     rootDir = get_directory_path()
@@ -105,6 +106,14 @@ def upload_to_baidu():
     bp.upload( rootDir, "ONDUP" )
 
     print(bp.list())   
+
+
+# this is shell command in list
+def get_bypy_upload_command () :
+
+    # TODO - later use another mofule get destination directory
+    command =  [ "bypy", "upload", get_directory_path(), "ONDUP" ]
+    return command
 
 
 

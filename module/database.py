@@ -19,7 +19,7 @@ dir_list_table  = db.table( 'dir_list' )
 
 # insert value to the 'dir_list'
 # NOTE - for inserting 
-def insert_dir_list( list ):
+def insert_dir_list( list, menu = None ):
     global dir_list_table
 
     user_info = get_logge_user_info()
@@ -49,7 +49,8 @@ def insert_dir_list( list ):
                 "created_at" : created_at,
                 "updated_at" : None,
                 "created_by" : user_info,
-                "updated_by" : None
+                "updated_by" : None,
+                "sku_filter" : menu
             } )
 
         insert_done = True

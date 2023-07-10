@@ -8,6 +8,7 @@ from resource_ui2 import Ui_MainWindow
 
 import time
 import json
+import subprocess
 import traceback, sys
 
 
@@ -39,6 +40,11 @@ class MainWindow( QMainWindow ):
         self._first_key = ""
         self._folder_chosen = True
 
+        self.Upload_Button_Clicked = False
+        self.Update_Button_Clicked = False
+
+    
+
         self._search_path_list = []
 
         self.threadpool = QThreadPool()
@@ -54,9 +60,7 @@ class MainWindow( QMainWindow ):
         self.vbox_menu = QVBoxLayout()
         self.combo_box_list : QComboBox() = [] 
 
-        # initial methods
-        # initial page menu setting
-        self.make_drop_down_menu()
+        
 
         self.setting_up_app()
 
@@ -67,7 +71,7 @@ class MainWindow( QMainWindow ):
         search_text = self.ui.search_input.text().strip()
 
         if search_text:
-            self.ui.search_label_9.setText(search_text)
+            self.ui.search_label_9.setText( search_text)
             # print("Search bar text ", search_text)
 
 
@@ -95,16 +99,71 @@ class MainWindow( QMainWindow ):
     ## -------------------------------------------------------------------------->
     def setting_up_app(self):
         
+        # for now we will use 2nd index of stack widget
+        self.ui.page_stackedWidget.setCurrentIndex(1)
+
         # set QPushbutton( upload in first page ) text
-        self.ui.pushButton.setText("Chose File")
+        self.ui.pushButton_upload.setText("Chose File")
 
         # set up for search completer
         self.searh_completer = QCompleter ( self._search_path_list )
-        # completer.setCaseSensitivity(0)
-
+        self.searh_completer.setCaseSensitivity(0)
         self.ui.search_input.setCompleter ( self.searh_completer )
 
-       
+        # initial methods
+        # initial page menu setting
+        self.make_drop_down_menu()
+
+        # make_goup_one visible and enable
+
+    
+    ## Group1 
+    def enable_show_g1 ( self ):
+        self.ui.pushButton_upload.setEnabled ( True )
+
+
+    ## Group1 disable
+    def disable_g1( self ):
+        self.ui.pushButton_upload.setEnabled ( False )
+
+
+    ## Group Edit 2 
+    def enable_show_ge2( self ):
+        self.ui.pushButton_update.setEnabled ( True )
+        self.ui.pushButton_download.setEnabled ( True )
+        self.ui.pushButton_remove.setEnabled ( True )
+        self.ui.radioButton_newDoc.setEnabled ( True )
+        self.ui.radioButton_addImage.setEnabled ( True)
+        self.ui.search_btn.setEnabled ( True )
+        self.ui.search_input.setEnabled (True)
+
+
+    ## Group Edit 2 disable
+    def disable_ge2( self ):
+        self.ui.pushButton_update.setEnabled ( False )
+        self.ui.pushButton_download.setEnabled ( False )
+        self.ui.pushButton_remove.setEnabled ( False )
+        self.ui.radioButton_newDoc.setEnabled ( False )
+        self.ui.radioButton_addImage.setEnabled ( False )
+        self.ui.search_btn.setEnabled ( False)
+        self.ui.search_input.setEnabled ( False )
+
+    
+    ## Group side bar
+    def enable_side_bar ( self ):
+        self.ui.home_btn_1.setEnabled ( True )
+        self.ui.home_btn_2.setEnabled ( True )
+        self.ui.dashboard_btn_1.setEnabled ( True )
+        self.ui.dashboard_btn_2.setEnabled ( True )
+
+
+    ## Group side bar disable
+    def diasble_side_bar ( self ):
+        self.ui.home_btn_1.setEnabled ( False )
+        self.ui.home_btn_2.setEnabled ( False )
+        self.ui.dashboard_btn_1.setEnabled ( False )
+        self.ui.dashboard_btn_2.setEnabled ( False )
+
 
 
     ##----------------------------------------------------------------------------/>
@@ -115,28 +174,123 @@ class MainWindow( QMainWindow ):
     ## function for changing menu page ------------------------------------------->
 
     def on_home_btn_1_toggled(self):        ## for uplaodpage
-        self.ui.page_stackedWidget.setCurrentIndex(0)
+        self._current_page_index = 0
+        self.update_page_status ()
     
+
     def on_home_btn_2_toggled(self):        ## for uplaodpage
-        self.ui.page_stackedWidget.setCurrentIndex(0)
+        self._current_page_index = 0
+        self.update_page_status ()
+    
 
     def on_dashboard_btn_1_toggled(self):   ## for  download page
-        self.ui.page_stackedWidget.setCurrentIndex(1)
+        self._current_page_index = 1
+        self.update_page_status ()
+    
 
     def on_dashboard_btn_2_toggled(self):   ## downlaod page
-        self.ui.page_stackedWidget.setCurrentIndex(1)
+        self._current_page_index = 1
+        self.update_page_status ()
+    
+
+    def update_page_status( self ):
+        if self._current_page_index == 0 :
+            self.enable_show_g1 ()
+            self.disable_ge2 ()
+        else:
+            self.enable_show_ge2 ()
+            self.disable_g1 ()
+
 
     ##  --------------------------------------------------------------------------/>
     ## !SECTION - Pagination
+
+
+    ## SECTION - Remove Acton
+    ## ---------------------------------------------------------------------------->
+
+    ## when user clicked remove push button
+    def on_pushButton_remove_pressed ( self ):
+
+        # show message_box do they really want to delete
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Removing Contents")
+        dlg.setText("Are  you sure you are willing to remove contents ??")
+        dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+        button = dlg.exec ()
+
+        if button == QMessageBox.Yes :
+            dlg1 = QMessageBox(self)
+            dlg1.setWindowTitle("Removing Contents now")
+            dlg1.setText("We will remove now ??")
+            dlg1.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+            button1 = dlg1.exec ()
+            if button1 == QMessageBox.Yes :
+                print ( "Removing Contents" )
+
+    ## later need to use worker signal to the background work
+
+    ## ----------------------------------------------------------------------------/>
+    ## !SECTION - Remove Action
+
+
+
+    ## SECTION - Download Action
+    ## ---------------------------------------------------------------------------->
+
+    ## when user clicked remove push button
+    def on_pushButton_download_pressed ( self ):
+
+        # show folder opening option
+        fname = QFileDialog.getExistingDirectory(self, 'Select Folder')
+
+        if fname:
+            print ( "Selected path " , fname)
+        else:
+            print ( "User did not chose anything " )
+
+    ## later need to use worker signal to the background work
+
+    ## ----------------------------------------------------------------------------/>
+    ## !SECTION - Download Action
+
+
+
+    ## SECTION - Update Action
+    ## ----------------------------------------------------------------------------->
+    ## when update button pressed
+    def on_pushButton_update_pressed ( self ):
+
+        # check the text vlaue in search input
+        search_input = self.ui.search_input.text(  ).strip ( )
+        
+        if search_input :
+            print ( "user selected contents ", search_input )
+        else :
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle("Search Content Empty")
+            dlg.setText("Pls , selec file contents from search area ")
+            dlg.setStandardButtons ( QMessageBox.Ok  )
+            dlg.exec ()
+
+
+
+    ## ----------------------------------------------------------------------------/>
+    ## !SECTION - Update Action
+
 
 
 
     ## SECTION - UPLOAD button pressed
     ## when click upload button --------------------------------------------------->
 
-    def on_pushButton_pressed( self ):
+    def on_pushButton_upload_pressed( self ):
+
+        #
+        self.Upload_Button_Clicked = True
+
         # disble upload button 
-        self.ui.pushButton.setDisabled ( True )
+        self.ui.pushButton_upload.setDisabled ( True )
 
         # 
         self.show_dialog_chosing_file()
@@ -154,16 +308,34 @@ class MainWindow( QMainWindow ):
         # dlg.setStandardButtons(QMessageBox.Yes| QMessageBox.No)
         chose_folder = QPushButton()
         chose_file  = QPushButton()
+        close_button = QPushButton()
         chose_folder.setText( "Chose Folder" )
         chose_file.setText(" Chose File" )
+
         chose_folder.clicked.connect(  self.folder_chosen )
         chose_file.clicked.connect(  self.file_chosen )
-        dlg.addButton( chose_folder, QMessageBox.YesRole )
-        dlg.addButton( chose_file, QMessageBox.NoRole )
+        close_button.clicked.connect ( self.file_chose_window_got_cancled )
+        
+        dlg.addButton ( chose_folder, QMessageBox.YesRole )
+        dlg.addButton ( chose_file, QMessageBox.NoRole )
+        # dlg.addButton ( close_button, QMessageBox.Cancel )
+
+        # dlg.addButton ( )
         # dlg.setStandardButtons (  )
         dlg.setIcon(QMessageBox.Question)
-        dlg.exec()
+        button = dlg.exec()
 
+        if button != QMessageBox.YesRole or button != QMessageBox.NoAll :
+            self.file_chose_window_got_cancled()
+
+
+    ##  
+    def file_chose_window_got_cancled ( self ):
+        #
+        self.Upload_Button_Clicked = False
+
+        # disble upload button 
+        self.ui.pushButton_upload.setEnabled ( True )
 
     ##
     def folder_chosen(self):
@@ -196,7 +368,7 @@ class MainWindow( QMainWindow ):
                 file_path = fname[0]
             print( " File selected ", file_path )
 
-            worker = WorkQT.Worker(self.test , file_path)
+            worker = WorkQT.Worker(self.ongoing_proccess , file_path)
             worker.signals.progress.connect(self.show_progress)
             worker.signals.result.connect(self.show_result)
             worker.signals.finished.connect(self.thread_complete)
@@ -209,7 +381,9 @@ class MainWindow( QMainWindow ):
 
     ## Test methods for uplaod
     ##
-    def test( self, path , progress_callback ):
+    def unzip_upload_insert( self, path , menu , progress_callback ):
+
+        print ("Menu given ", menu)
 
         # clearing temp folder
         clear_dir = M_upload.clear_temp_dir() 
@@ -226,26 +400,38 @@ class MainWindow( QMainWindow ):
             # if unzip succesfull
             if result[ "start_unzipping" ]:
                 print ( "Unzipped , will uplaod to baidu ")
+
         progress_callback.emit( "Unzipped" )
 
         # getting the list
         folder_list = M_upload.get_folder_list() 
         # print ( "Is zip file ", M_upload.is_zip_file( path ) )
-        print ( "List of directorries ", folder_list )
+        print ( "List of directorries ", folder_list, menu )
 
-        # upload to baidu
+
+        
         progress_callback.emit( "uploading to baidu" )
-        M_upload.upload_to_baidu()
+
+        # call upload module get the path
+        command = M_upload.get_bypy_upload_command ()
+
+        # use subproccess to uplaod 
+        self.suproccess_show_plaintext ( command, progress_callback)
+        
         progress_callback.emit( "uploading to baidu is done" )
         
-
+        # clearing temp directory
         print ( " Clear temp folder ", M_upload.clear_temp_dir() )
 
-        insert_result = Database.insert_dir_list ( folder_list )
+        # insterting data
+        insert_result = Database.insert_dir_list ( folder_list, menu )
         print ( "DB insert result" , insert_result )
 
         # enable upload button
-        self.ui.pushButton.setEnabled(True)
+        self.ui.pushButton_upload.setEnabled(True)
+
+        #  
+        self.Upload_Button_Clicked = False
 
 
 
@@ -253,10 +439,43 @@ class MainWindow( QMainWindow ):
     ## SECTION  WORKER Class method For Upload
     def ongoing_proccess(self,file_path,progress_callback):
         
-        # file_path = "/home/gq/Documents/Project/GQ/Baidu_File_Management/Github/test3_adding_UI_for_future_functional/style.qss"
+        # show thar process starte
         progress_callback.emit("Process started")
-        if (self.M_Uplaod.is_zip_file(file_path)):
-            pass
+
+        # first check all the comboxes selected or not
+        all_comboboxes_selected = False
+        all_text = ""
+
+        # check all existing comboboxes in scroll_area_editpage
+        i = 0
+        for menu in self.combo_box_list :
+            text = menu.currentText ()
+
+            if text :
+                print ( "Got selected menu ", text )
+                all_comboboxes_selected = True
+                if i > 0:
+                    all_text += "." + text
+                else:
+                    all_text +=  text
+            else :
+                print ( "Combobox not selected" )
+                all_comboboxes_selected = False
+            i += 1
+
+        # if comboboxes are not all set show message
+        if not all_comboboxes_selected :
+            self.show_popup_text ( "Menu missing !!" , "All menu not selected, pls selected" +
+                              " all menu first thne click uplod" )
+        else :
+            self.unzip_upload_insert ( file_path, all_text, progress_callback )
+
+        
+    
+
+        #
+        # if (self.M_Uplaod.is_zip_file(file_path)):
+        #     pass
 
         # for n in range(1,100):
         #     value = "Checking file type for given '" + file_path + "' Pls Wait"
@@ -267,7 +486,8 @@ class MainWindow( QMainWindow ):
 
     ## show progress
     def show_progress(self, s):
-        print(s)
+        self.ui.plainText_show.setPlainText ( s )
+        print("from worker ",s)
 
     ## result
     def show_result(self, s):
@@ -639,6 +859,35 @@ class MainWindow( QMainWindow ):
             widget.setDisabled()
         else:
             widget.setEnabled()
+
+
+
+    # show message box without tex
+    def show_popup_text ( self , title, details ) :
+        # show message_box do they really want to delete
+        dlg = QMessageBox( self )
+        dlg.setWindowTitle( title )
+        dlg.setText( details )
+        dlg.setStandardButtons ( QMessageBox.Ok )
+        dlg.exec ()
+
+
+    # NOTE - using subproccessing to do bypy work 
+    def suproccess_show_plaintext ( self, command_list , progress_callback )  :
+
+        proc =  subprocess.Popen( command_list  , stdout=subprocess.PIPE )
+
+        while True:
+            line = proc.stdout.readline()
+            if not line:
+                break
+
+            # print ( "test:", line.rstrip() )
+            value = str ( line, "utf-8") 
+            print("subprocces ", value)
+
+            progress_callback.emit ( value )
+
 
     ## ---------------------------------------------------------------------------------/>
     ## !SECTION
