@@ -50,7 +50,7 @@ class MainWindow( QMainWindow ):
         self.threadpool = QThreadPool()
 
         # getting ui elements
-        self.scroll_content_0 = self.ui.scrollArea
+        self.scroll_content_0 = self.ui.scrollArea_2_edit_page
         self.vbox_menu = QVBoxLayout()
         self.combo_box_list : QComboBox() = [] 
 

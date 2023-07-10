@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>963</width>
+    <width>758</width>
     <height>676</height>
    </rect>
   </property>
@@ -503,8 +503,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>527</width>
+                  <height>246</height>
                  </rect>
                 </property>
                </widget>
@@ -598,7 +598,7 @@
            <widget class="QWidget" name="show_result_widget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_12">
              <item>
-              <widget class="QPlainTextEdit" name="plainTextEdit"/>
+              <widget class="QPlainTextEdit" name="plainText_show"/>
              </item>
             </layout>
            </widget>
@@ -643,7 +643,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>750</width>
+                  <width>545</width>
                   <height>148</height>
                  </rect>
                 </property>
@@ -660,14 +660,17 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
-                <widget class="QRadioButton" name="radioButton">
+                <widget class="QRadioButton" name="radioButton_newDoc">
                  <property name="text">
                   <string>Replace Old Doc file And Add new Doc file</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QRadioButton" name="radioButton_2">
+                <widget class="QRadioButton" name="radioButton_addImage">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
                   <string>Add new images to the same old doc file</string>
                  </property>
@@ -683,7 +686,7 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
-                  <widget class="QLabel" name="label_2">
+                  <widget class="QLabel" name="label_show">
                    <property name="font">
                     <font>
                      <pointsize>12</pointsize>
@@ -695,7 +698,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_2">
+                  <widget class="QLineEdit" name="input_area">
                    <property name="font">
                     <font>
                      <pointsize>12</pointsize>
@@ -706,7 +709,7 @@
                 </layout>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_2">
+                <widget class="QPushButton" name="pushButton_upload">
                  <property name="font">
                   <font>
                    <family>Poppins</family>
@@ -717,19 +720,6 @@
                   <string>Upload</string>
                  </property>
                 </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>307</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
               </layout>
              </item>
@@ -793,7 +783,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_4">
+              <widget class="QPushButton" name="pushButton_download">
                <property name="font">
                 <font>
                  <family>Poppins</family>
@@ -819,7 +809,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_5">
+              <widget class="QPushButton" name="pushButton_remove">
                <property name="font">
                 <font>
                  <family>Poppins</family>
