@@ -1,3 +1,4 @@
+import os
 import  sys
 from PyQt5.QtWidgets import  *
 from PyQt5.QtCore import *
@@ -5,9 +6,10 @@ from PyQt5.QtGui import *
 from functools import partial
 from resource_ui2 import Ui_MainWindow
 
-
+import shutil
 import time
 import json
+import datetime
 import subprocess
 import traceback, sys
 
@@ -115,7 +117,8 @@ class MainWindow( QMainWindow ):
         self.make_drop_down_menu()
 
         # make_goup_one visible and enable
-
+        self.update_page_status ()
+        self.hide_some_ui ()
     
     ## Group1 
     def enable_show_g1 ( self ):
@@ -163,6 +166,11 @@ class MainWindow( QMainWindow ):
         self.ui.home_btn_2.setEnabled ( False )
         self.ui.dashboard_btn_1.setEnabled ( False )
         self.ui.dashboard_btn_2.setEnabled ( False )
+
+    ## hide some elements
+    def hide_some_ui ( self ):
+        self.ui.radioButton_addImage.setHidden ( True )
+        self.ui.radioButton_newDoc.setHidden ( True )
 
 
 
@@ -228,6 +236,51 @@ class MainWindow( QMainWindow ):
             if button1 == QMessageBox.Yes :
                 print ( "Removing Contents" )
 
+
+                search_input = self.ui.search_input.text(  ).strip ( )
+                if search_input :
+
+                    print ( "user selected contents ", search_input )
+
+                    # get value from search input
+                    path = search_input.split( "  Directory:" ) [1]
+                    print ( "Selected Path " , path)
+
+                    worker = WorkQT.Worker (self.remove_proccess, path)
+                    worker.signals.finished.connect ( self.removed )
+                    self.threadpool.start ( worker )
+                        
+                
+                else :
+                    self.show_popup_text ( "File not selected", "In search box chose ")
+
+
+    def remove_proccess(self, path , progress_callback):
+
+        # lets get path and the file name
+        head, tail = os.path.split ( path )
+
+        ondup = "ONDUP/" +path
+        command = [ "bypy", "remove" , ondup ]
+        self.suproccess_show_plaintext ( command, progress_callback)
+
+        file_exists = self.subproccess_check_file_exists2 ( tail, head, progress_callback  )
+
+        if file_exists :
+            print ( " failled to remove " )
+        else :
+
+            print ( Database.delete_path_list ( path ) )
+
+            pass
+
+
+
+    def removed (self):
+        print ( "File removed")
+
+    
+
     ## later need to use worker signal to the background work
 
     ## ----------------------------------------------------------------------------/>
@@ -241,13 +294,42 @@ class MainWindow( QMainWindow ):
     ## when user clicked remove push button
     def on_pushButton_download_pressed ( self ):
 
-        # show folder opening option
-        fname = QFileDialog.getExistingDirectory(self, 'Select Folder')
 
-        if fname:
-            print ( "Selected path " , fname)
-        else:
-            print ( "User did not chose anything " )
+        search_input = self.ui.search_input.text(  ).strip ( )
+
+        if search_input :
+
+            print ( "user selected contents ", search_input )
+
+            # get value from search input
+            path = search_input.split( "  Directory:" ) [1]
+            print ( "Selected Path " , path)
+
+            # show folder opening option
+            fname = QFileDialog.getExistingDirectory(self, 'Select Folder')
+
+
+
+            if fname:
+                print ( "Selected path " , fname)
+                worker = WorkQT.Worker (self.download_proccess, path, fname)
+                worker.signals.progress.connect ( self.download_progress )
+                self.threadpool.start ( worker )
+                
+            else:
+                print ( "User did not chose anything " )
+        
+        else :
+            self.show_popup_text ( "File not selected", "In search are chose a file")
+
+    def download_proccess (self, bypy_path, local_path, progress_callback):
+        bypy_path = "ONDUP" + bypy_path
+        command = [ "bypy", "download", bypy_path, local_path  ]
+        self.suproccess_show_plaintext ( command, progress_callback)
+
+    def download_progress (self, s):
+        self.ui.plainText_show.setPlainText (s)
+
 
     ## later need to use worker signal to the background work
 
@@ -265,14 +347,132 @@ class MainWindow( QMainWindow ):
         search_input = self.ui.search_input.text(  ).strip ( )
         
         if search_input :
-            print ( "user selected contents ", search_input )
-        else :
-            dlg = QMessageBox(self)
-            dlg.setWindowTitle("Search Content Empty")
-            dlg.setText("Pls , selec file contents from search area ")
-            dlg.setStandardButtons ( QMessageBox.Ok  )
-            dlg.exec ()
 
+            print ( "user selected contents ", search_input )
+
+            # get value from search input
+            path = search_input.split( "  Directory:" ) [1]
+            print ( "Selected Path " , path)
+
+            # get database value for giben *path*
+            result = Database.get_info_based_on_path ( path )
+            print ( " on_pushButton_update_pressed  ", str ( result ) )
+
+            # new file name
+            new_file_name = result[0][ "path" ].split ( "/" )[-1]
+            print ( "File name ", new_file_name )
+
+            # menu from json
+            menu = result[0][ "sku_filter" ]
+            print ( "Menu for update ", menu )
+
+            # ask user permission to open file
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle("Select File")
+            dlg.setText("Select relevant file to  upload")
+            dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+            button = dlg.exec ()
+
+            # if user accept show file opening dialog
+            if button == QMessageBox.Yes :
+
+                # ask user to select a file
+                new_file_location_pc = QFileDialog.getOpenFileName(self, "Select file", "", "All Files (*)" )
+                print ( "new_file_location_pc ", new_file_location_pc, " type ", type ( new_file_location_pc ) )
+                new_file_location_pc = new_file_location_pc[0]
+                print ( "new_file_location_pc ", new_file_location_pc, " type ", type ( new_file_location_pc ) )
+
+                # get path for bypy from old file location  in bypy
+                new_file_path_bypy = path.replace ( new_file_name, "" )
+                print ( "new file path bypy", new_file_path_bypy )
+
+                # connect worker 
+                worker = WorkQT.Worker ( self.update_ongoing_proccess ,
+                                        new_file_location_pc , new_file_path_bypy, new_file_name, menu   )
+                worker.signals.progress.connect ( self.update_show_progress )
+                worker.signals.finished.connect ( self.update_complete )
+                
+                self.threadpool.start ( worker )
+        else :
+            self.show_popup_text ( "Search Content Empty", "Pls , selec file contents from search area " )
+
+        
+
+        
+
+
+    def update_ongoing_proccess (self, 
+                                 new_file_location_pc , new_file_path_bypy, new_file_name, menu, progress_callback ) :
+        
+        # Disable:: sidebar, Group 1-2
+        self.disable_g1 ()
+        self.disable_ge2 ()
+        self.diasble_side_bar () 
+
+       
+        
+        # copy file it to the temp folder
+        print ( "Clear temp dir ", M_upload.clear_temp_dir())
+        moduel_path  = M_upload.get_directory_path ()
+        shutil.copy ( new_file_location_pc , moduel_path )
+
+
+        # get selected file name
+        head, tail = os.path.split ( new_file_location_pc )
+        selected_file_name = tail
+
+        # create a name for the file
+        new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
+        new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
+
+
+        now = datetime.datetime.now()
+        now = now.strftime('%m-%d-%y_%H-%M')
+        new_file_name_witout_extension = new_file_name_witout_extension + "_" + str ( now )
+        new_file_name = new_file_name_witout_extension + new_file_only_extension
+        print ( "new file name  after adding extension and date ", new_file_name  )
+
+        
+        # rename document 
+        M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
+
+        # get upload cmmand
+        command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
+
+        # NOTE - Update Document using subprocces
+        self.suproccess_show_plaintext ( command, progress_callback )
+
+        # check file upload succcesfull 
+        file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
+
+        if file_uploaded :
+            new_file_path_bypy += "/" + new_file_name
+            list1 = [ new_file_path_bypy ]
+            insert_db = Database.insert_dir_list( list1, menu )
+            print (" file uplaoded done , insert_db ", insert_db)
+            progress_callback.emit ( "file upload done ")
+
+        else:
+            print ("failed to uplaod file")
+            progress_callback.emit ( "failled to upload file" )
+
+        # clear temp dir
+        print ( M_upload.clear_temp_dir () )
+
+
+
+    # progress
+    def update_show_progress(self, s):     
+        self.ui.plainText_show.setPlainText ( s )   
+        print (s)
+
+
+    def update_complete(self ):
+        print ( "Update done ")
+
+        # Enable:: sidebar, group 2
+        self.enable_show_ge2 ()
+        self.enable_side_bar ()
 
 
     ## ----------------------------------------------------------------------------/>
@@ -364,6 +564,10 @@ class MainWindow( QMainWindow ):
         if fname:
             if self._folder_chosen:
                 file_path   =   fname
+
+                clear_dir = M_upload.clear_temp_dir() 
+                print ("Clear fir")
+                M_upload.copy_file_to_temp ( file_path )
             else:
                 file_path = fname[0]
             print( " File selected ", file_path )
@@ -385,15 +589,15 @@ class MainWindow( QMainWindow ):
 
         print ("Menu given ", menu)
 
-        # clearing temp folder
-        clear_dir = M_upload.clear_temp_dir() 
-        print ( "clear_dir ", clear_dir["clear_temp_dir"] )
-        progress_callback.emit ( "clear_dir"  )
+        
 
         # checking giving path belongs to a zip
         is_zip_file = M_upload.is_zip_file( path )
         if is_zip_file :
-
+            # clearing temp folder
+            clear_dir = M_upload.clear_temp_dir() 
+            print ( "clear_dir ", clear_dir["clear_temp_dir"] )
+            progress_callback.emit ( "clear_dir"  )
             # unzip
             result = M_upload.start_unzipping ( path )
 
@@ -401,14 +605,19 @@ class MainWindow( QMainWindow ):
             if result[ "start_unzipping" ]:
                 print ( "Unzipped , will uplaod to baidu ")
 
-        progress_callback.emit( "Unzipped" )
+            progress_callback.emit( "Unzipped" )
 
-        # getting the list
-        folder_list = M_upload.get_folder_list() 
-        # print ( "Is zip file ", M_upload.is_zip_file( path ) )
-        print ( "List of directorries ", folder_list, menu )
-
-
+            # getting the list
+            folder_list = M_upload.get_folder_list() 
+            # print ( "Is zip file ", M_upload.is_zip_file( path ) )
+            # print ( "List of directorries ", folder_list, menu )
+        
+        else :
+            if not self._folder_chosen:
+                M_upload.clear_temp_dir()
+                modue_path = M_upload.get_directory_path ()
+                shutil.copy( path, modue_path )
+            folder_list = M_upload.get_folder_list ()
         
         progress_callback.emit( "uploading to baidu" )
 
@@ -424,7 +633,9 @@ class MainWindow( QMainWindow ):
         print ( " Clear temp folder ", M_upload.clear_temp_dir() )
 
         # insterting data
+        
         insert_result = Database.insert_dir_list ( folder_list, menu )
+        
         print ( "DB insert result" , insert_result )
 
         # enable upload button
@@ -487,7 +698,7 @@ class MainWindow( QMainWindow ):
     ## show progress
     def show_progress(self, s):
         self.ui.plainText_show.setPlainText ( s )
-        print("from worker ",s)
+        # print("from worker ",s)
 
     ## result
     def show_result(self, s):
@@ -800,7 +1011,7 @@ class MainWindow( QMainWindow ):
     def update_search_path( self ):
         model = self.searh_completer.model ()
         model.setStringList( self._search_path_list)
-        print ("Search completer updated ")
+        # print ("Search completer updated ")
         
 
     # get search list from 
@@ -809,21 +1020,22 @@ class MainWindow( QMainWindow ):
         # Comobox nth menu for now by deafult None
         # if loop through all menu return no text , it will be none
         # we will get from another method
-        filter_json = None
-        # for i in range ( 0, 4):
-        #     filter_list = []
+        filter_menu = ""
+        for item in self.combo_box_list:
+            if item.currentText () is not None:
+                filter_menu  += "." + item.currentText ()
 
         # Try to get text from search
         searc_txt = self.ui.search_input
 
         # call database to get data on this 
-        result_list = Database.get_dir_list()
-        print ( result_list )
+        result_list = Database.get_dir_list( filter_menu )
+        # print ( result_list )
 
         # put the list in self._search_path_list
         self._search_path_list = result_list
 
-        print ("Now update the completer")
+        # print ("Now update the completer")
         self.update_search_path()
 
 
@@ -888,6 +1100,61 @@ class MainWindow( QMainWindow ):
 
             progress_callback.emit ( value )
 
+
+    
+    # NOTE - use subprocces  to check file exists or not
+    def subproccess_check_file_exists ( self, file_name, progress_callback  ):
+
+        text_Found = False
+        file_name_exists = False
+
+        print (" File name from subprocces ", file_name )
+        command = [ "bypy", "search", file_name ]
+        proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
+        while True:
+            line = proc.stdout.readline()
+            if not line:
+                break
+
+            # print ( "test:", line.rstrip() )
+            value = str ( line, "utf-8") .strip()
+            print("subprocces ", value)
+            progress_callback.emit ( value )
+
+            if "Found" in value :
+                text_Found = True
+            if text_Found and file_name in value:
+                file_name_exists = True
+
+        if file_name_exists:
+            return True
+        
+            
+
+    def subproccess_check_file_exists2 ( self, file_name, remote_path ,progress_callback  ):
+        text_Found = False
+        file_name_exists = False
+
+        print (" File name from subprocces ", file_name, "\t remote path ", remote_path )
+        command = [ "bypy", "search", file_name, remote_path ]
+        proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
+        while True:
+            line = proc.stdout.readline()
+            if not line:
+                break
+
+            # print ( "test:", line.rstrip() )
+            value = str ( line, "utf-8") .strip()
+            print("subprocces ", value)
+            progress_callback.emit ( value )
+
+            if "Found" in value :
+                text_Found = True
+            if text_Found and file_name in value:
+                file_name_exists = True
+
+        if file_name_exists:
+            return True
 
     ## ---------------------------------------------------------------------------------/>
     ## !SECTION
