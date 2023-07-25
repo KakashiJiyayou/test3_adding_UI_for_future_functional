@@ -425,10 +425,14 @@ class MainWindow( QMainWindow ):
         new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
         new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
 
+        if "_copy(" in new_file_name_witout_extension :
+            head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+            new_file_name_witout_extension = head
+
 
         now = datetime.datetime.now()
         now = now.strftime('%m-%d-%y_%H-%M')
-        new_file_name_witout_extension = new_file_name_witout_extension + "_" + str ( now )
+        new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
         new_file_name = new_file_name_witout_extension + new_file_only_extension
         print ( "new file name  after adding extension and date ", new_file_name  )
 
@@ -605,19 +609,48 @@ class MainWindow( QMainWindow ):
 
             progress_callback.emit( "Unzipped" )
 
-            # getting the list
-            folder_list = M_upload.get_folder_list() 
-            # print ( "Is zip file ", M_upload.is_zip_file( path ) )
-            # print ( "List of directorries ", folder_list, menu )
         
         else :
             if not self._folder_chosen:
                 M_upload.clear_temp_dir()
                 modue_path = M_upload.get_directory_path ()
                 shutil.copy( path, modue_path )
-            folder_list = M_upload.get_folder_list ()
         
         progress_callback.emit( "uploading to baidu" )
+
+        folder_list = M_upload.get_folder_list ()
+        for item in folder_list :
+            temp_file_name = item.strip ("/")
+            # get selected file name
+            new_file_name_witout_extension = os.path.splitext ( temp_file_name )[ 0 ]
+            new_file_only_extension = os.path.splitext( temp_file_name )[ 1 ]
+
+            if "_copy(" in new_file_name_witout_extension :
+                head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+                new_file_name_witout_extension = head
+
+
+            now = datetime.datetime.now()
+            now = now.strftime('%m-%d-%y_%H-%M')
+            new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
+            new_file_name = new_file_name_witout_extension + new_file_only_extension
+            print ( "new file name  after adding extension and date ", new_file_name  )
+
+            if self.subproccess_check_file_exists ( temp_file_name, progress_callback ) :
+                print (" unzip_upload_insert file name exists " , temp_file_name )
+                # rename document 
+                M_upload.rename_file_in_temp ( temp_file_name, new_file_name )
+            else:
+                print (" unzip_upload_insert file name does not exists ",temp_file_name  )
+                
+                
+
+        folder_list = M_upload.get_folder_list ()
+        print (" unzip_upload_insert ", folder_list)
+
+
+        # # check same file name exists or not 
+        # file_exists= self.subproccess_check_file_exists ( new_file_name, progress_callback )
 
         # call upload module get the path
         command = M_upload.get_bypy_upload_command ()
