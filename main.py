@@ -589,8 +589,6 @@ class MainWindow( QMainWindow ):
 
         print ("Menu given ", menu)
 
-        
-
         # checking giving path belongs to a zip
         is_zip_file = M_upload.is_zip_file( path )
         if is_zip_file :
