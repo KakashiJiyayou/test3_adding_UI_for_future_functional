@@ -674,13 +674,10 @@ class MainWindow( QMainWindow ):
 
         # if comboboxes are not all set show message
         if not all_comboboxes_selected :
-            self.show_popup_text ( "Menu missing !!" , "All menu not selected, pls selected" +
-                              " all menu first thne click uplod" )
+            progress_callback.emit("menu not selected")
         else :
             self.unzip_upload_insert ( file_path, all_text, progress_callback )
-
-        
-    
+            progress_callback.emit("menu  selected")
 
         #
         # if (self.M_Uplaod.is_zip_file(file_path)):
@@ -696,6 +693,11 @@ class MainWindow( QMainWindow ):
     ## show progress
     def show_progress(self, s):
         self.ui.plainText_show.setPlainText ( s )
+
+        # if menu not selected
+        if "menu not selected" in s :
+            self.show_popup_text ( "Menu missing !!" , "All menu not selected, pls selected" +
+                              " all menu first thne click uplod" )
         # print("from worker ",s)
 
     ## result
