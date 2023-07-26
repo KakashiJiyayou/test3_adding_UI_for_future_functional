@@ -729,7 +729,7 @@ class MainWindow( QMainWindow ):
 
         # if menu not selected
         if "menu not selected" in s :
-            self.show_popup_text ( "Menu missing !!" , "All menu not selected, pls selected" +
+            self.show_popup_text ( "Menu  missing !!" , "All menu not selected, pls selected" +
                               " all menu first thne click uplod" )
     ## result
     def show_result(self, s):
