@@ -41,6 +41,7 @@ class MainWindow( QMainWindow ):
         self._Menu_Json = None
         self._first_key = ""
         self._folder_chosen = True
+        self._is_english = True
 
         self.Upload_Button_Clicked = False
         self.Update_Button_Clicked = False
@@ -214,6 +215,54 @@ class MainWindow( QMainWindow ):
     ## !SECTION - Pagination
 
 
+
+
+    ## SECTION - Change Language
+    ## ----------------------------------------------------------------------------->
+
+    def on_pushButton_Change_lang_pressed(self):
+        self._is_english = not self._is_english
+        self.update_language_setting ()
+        
+
+
+    def on_pushButton_2_change_language_pressed(self):
+        self._is_english = not self._is_english
+        self.update_language_setting ()
+
+
+    def update_language_setting ( self ):
+        print ( "update language ", self._is_english )
+        if self._is_english:
+            self.ui.home_btn_2.setText ( "Upload" )
+            self.ui.dashboard_btn_2.setText ( "Operation")
+            self.ui.pushButton_Change_lang.setText( "CN" )
+            self.ui.exit_btn_2.setText ( "Exit" )
+            self.ui.pushButton_update.setText ("Update")
+            self.ui.pushButton_remove.setText ( "Remove" )
+            self.ui.pushButton_download.setText ( "Download" )
+            self.ui.pushButton_upload.setText ( "Upload" )
+            self.ui.search_btn.setText ( "Search" )
+
+        else :
+            self.ui.home_btn_2.setText ( "上传" )
+            self.ui.dashboard_btn_2.setText ( "服务")
+            self.ui.pushButton_Change_lang.setText( "EN" )
+            self.ui.exit_btn_2.setText ( "出口" )
+            self.ui.pushButton_update.setText ("更新")
+            self.ui.pushButton_remove.setText ( "消除" )
+            self.ui.pushButton_download.setText ( "下载" )
+            self.ui.pushButton_upload.setText ( "上传" )
+            self.ui.search_btn.setText ( "搜索" )
+
+
+
+    ## -----------------------------------------------------------------------------/>
+    ## !SECTION - Change Language
+
+
+
+
     ## SECTION - Remove Acton
     ## ---------------------------------------------------------------------------->
 
@@ -222,16 +271,34 @@ class MainWindow( QMainWindow ):
 
         # show message_box do they really want to delete
         dlg = QMessageBox(self)
-        dlg.setWindowTitle("Removing Contents")
-        dlg.setText("Are  you sure you are willing to remove contents ??")
-        dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+
+        # setting language
+        if self._is_english :
+            dlg.setWindowTitle("Removing Contents")
+            dlg.setText("Are  you sure you are willing to remove contents ??")
+            dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+        else:
+            dlg.setWindowTitle("删除内容")
+            dlg.setText("您确定愿意删除内容吗 ??")
+            dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+          
+
         button = dlg.exec ()
+
 
         if button == QMessageBox.Yes :
             dlg1 = QMessageBox(self)
-            dlg1.setWindowTitle("Removing Contents now")
-            dlg1.setText("We will remove now ??")
-            dlg1.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+
+            # setting language
+            if self._is_english:
+                dlg1.setWindowTitle("Removing Contents now")
+                dlg1.setText("We will remove now ??")
+                dlg1.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+            else:
+                dlg1.setWindowTitle("立即删除内容")
+                dlg1.setText("我们现在将删除??")
+                dlg1.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
+            
             button1 = dlg1.exec ()
             if button1 == QMessageBox.Yes :
                 print ( "Removing Contents" )
@@ -252,7 +319,11 @@ class MainWindow( QMainWindow ):
                         
                 
                 else :
-                    self.show_popup_text ( "File not selected", "In search box chose ")
+                    if self._is_english:
+                        self.show_popup_text ( "File not selected", "First type text in search area then choose the file you want to make changes")
+                    else :
+                        self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
+
 
 
     def remove_proccess(self, path , progress_callback):
@@ -320,7 +391,10 @@ class MainWindow( QMainWindow ):
                 print ( "User did not chose anything " )
         
         else :
-            self.show_popup_text ( "File not selected", "In search are chose a file")
+            if self._is_english:
+                self.show_popup_text ( "File not selected", "First type text in search area then choose the file you want to make changes")
+            else :
+                self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
 
     def download_proccess (self, bypy_path, local_path, progress_callback):
         bypy_path = "ONDUP" + bypy_path
@@ -368,8 +442,15 @@ class MainWindow( QMainWindow ):
 
             # ask user permission to open file
             dlg = QMessageBox(self)
-            dlg.setWindowTitle("Select File")
-            dlg.setText("Select relevant file to  upload")
+
+            # setting language
+            if self._is_english:
+                dlg.setWindowTitle("Select File")
+                dlg.setText("Select a  file to  upload")
+            else:
+                dlg.setWindowTitle("选择文件")
+                dlg.setText("选择要上传的文件")
+
             dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
             button = dlg.exec ()
 
@@ -394,11 +475,12 @@ class MainWindow( QMainWindow ):
                 
                 self.threadpool.start ( worker )
         else :
-            self.show_popup_text ( "Search Content Empty", "Pls , selec file contents from search area " )
+            if self._is_english:
+                self.show_popup_text ( "File not selected", "First type text in search area then choose the file you want to make changes")
+            else :
+                self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
 
-        
 
-        
 
 
     def update_ongoing_proccess (self, 
@@ -409,59 +491,62 @@ class MainWindow( QMainWindow ):
         self.disable_ge2 ()
         self.diasble_side_bar () 
 
-       
-        
-        # copy file it to the temp folder
-        print ( "Clear temp dir ", M_upload.clear_temp_dir())
-        moduel_path  = M_upload.get_directory_path ()
-        shutil.copy ( new_file_location_pc , moduel_path )
+        if not len (  new_file_location_pc ) < 3:
+            
+            print("Given file path ", new_file_location_pc)
+            
+            
+            # copy file it to the temp folder
+            print ( "Clear temp dir ", M_upload.clear_temp_dir())
+            moduel_path  = M_upload.get_directory_path ()
+            shutil.copy ( new_file_location_pc , moduel_path )
 
 
-        # get selected file name
-        head, tail = os.path.split ( new_file_location_pc )
-        selected_file_name = tail
+            # get selected file name
+            head, tail = os.path.split ( new_file_location_pc )
+            selected_file_name = tail
 
-        # create a name for the file
-        new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
-        new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
+            # create a name for the file
+            new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
+            new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
 
-        if "_copy(" in new_file_name_witout_extension :
-            head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
-            new_file_name_witout_extension = head
+            if "_copy(" in new_file_name_witout_extension :
+                head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+                new_file_name_witout_extension = head
 
 
-        now = datetime.datetime.now()
-        now = now.strftime('%m-%d-%y_%H-%M')
-        new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
-        new_file_name = new_file_name_witout_extension + new_file_only_extension
-        print ( "new file name  after adding extension and date ", new_file_name  )
+            now = datetime.datetime.now()
+            now = now.strftime('%m-%d-%y_%H-%M')
+            new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
+            new_file_name = new_file_name_witout_extension + new_file_only_extension
+            print ( "new file name  after adding extension and date ", new_file_name  )
 
-        
-        # rename document 
-        M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
+            
+            # rename document 
+            M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
 
-        # get upload cmmand
-        command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
+            # get upload cmmand
+            command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
 
-        # NOTE - Update Document using subprocces
-        self.suproccess_show_plaintext ( command, progress_callback )
+            # NOTE - Update Document using subprocces
+            self.suproccess_show_plaintext ( command, progress_callback )
 
-        # check file upload succcesfull 
-        file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
+            # check file upload succcesfull 
+            file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
 
-        if file_uploaded :
-            new_file_path_bypy += "/" + new_file_name
-            list1 = [ new_file_path_bypy ]
-            insert_db = Database.insert_dir_list( list1, menu )
-            print (" file uplaoded done , insert_db ", insert_db)
-            progress_callback.emit ( "file upload done ")
+            if file_uploaded :
+                new_file_path_bypy += "/" + new_file_name
+                list1 = [ new_file_path_bypy ]
+                insert_db = Database.insert_dir_list( list1, menu )
+                print (" file uplaoded done , insert_db ", insert_db)
+                progress_callback.emit ( "file upload done ")
 
-        else:
-            print ("failed to uplaod file")
-            progress_callback.emit ( "failled to upload file" )
+            else:
+                print ("failed to uplaod file")
+                progress_callback.emit ( "failled to upload file" )
 
-        # clear temp dir
-        print ( M_upload.clear_temp_dir () )
+            # clear temp dir
+            print ( M_upload.clear_temp_dir () )
 
 
 
@@ -504,17 +589,26 @@ class MainWindow( QMainWindow ):
     # 
     def show_dialog_chosing_file( self ): 
         dlg = QMessageBox(self)
-        dlg.setWindowTitle("Opening File")
-        dlg.setText("Here chose wheter to chose directory or" +
-                     " Just want to open file (.zip, .png, .jpg etc...) ")
         
         # setting buttons for dialog
         # dlg.setStandardButtons(QMessageBox.Yes| QMessageBox.No)
         chose_folder = QPushButton()
         chose_file  = QPushButton()
         close_button = QPushButton()
-        chose_folder.setText( "Chose Folder" )
-        chose_file.setText(" Chose File" )
+
+        #  set text for different language
+        if self._is_english:
+            dlg.setWindowTitle("Opening File")
+            dlg.setText("Here you have option to upload whole directory or" +
+                        " you can just to upload a single file (.zip, .png, .jpg etc...) ")
+            chose_file.setText(" Choose File" )
+            chose_folder.setText( "Choose Folder" )
+        else :
+            dlg.setWindowTitle("打开文件")
+            dlg.setText("在这里您可以选择上传整个目录，也可以只上传单个文件（.zip、.png、.jpg 等...）")
+            chose_file.setText("选择文件" )
+            chose_folder.setText( "选择文件夹" )
+
 
         chose_folder.clicked.connect(  self.folder_chosen )
         chose_file.clicked.connect(  self.file_chosen )
@@ -729,8 +823,11 @@ class MainWindow( QMainWindow ):
 
         # if menu not selected
         if "menu not selected" in s :
-            self.show_popup_text ( "Menu missing !!" , "All menu not selected, pls selected" +
-                              " all menu first thne click uplod" )
+            if self._is_english:
+                self.show_popup_text ( "Menu missing !!", " All menu not selected, please select all menu first then click upload" )
+            else :
+                self.show_popup_text ( "菜单缺失！！","所有菜单未选择，请先选择所有菜单然后点击上传" )
+
     ## result
     def show_result(self, s):
         print("Showing resutl done for this even ",s)
@@ -785,7 +882,8 @@ class MainWindow( QMainWindow ):
 
     def result_for_initial_menu_creation(self, s):
         label = QLabel(self)
-        label.setText("Chose File" )
+        label.setText("Choose File 选择文件" )
+        
 
         combo = QComboBox(self)
         combo.addItems(self._initial_menu_list)
