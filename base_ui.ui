@@ -123,6 +123,24 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/icon/icon/product-32.ico</normaloff>
+             <normalon>:/icon/icon/product-48.ico</normalon>:/icon/icon/product-32.ico</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -271,6 +289,27 @@
              <width>14</width>
              <height>14</height>
             </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_Change_lang">
+           <property name="text">
+            <string>CN</string>
+           </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/icon/icon/product-32.ico</normaloff>
+             <normalon>:/icon/icon/product-48.ico</normalon>:/icon/icon/product-32.ico</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+Z</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -503,8 +542,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>527</width>
-                  <height>246</height>
+                  <width>45</width>
+                  <height>16</height>
                  </rect>
                 </property>
                </widget>
@@ -832,7 +871,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>100</height>
+              <height>10</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -1004,6 +1043,38 @@
     <hint type="destinationlabel">
      <x>441</x>
      <y>622</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>pushButton_Change_lang</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>31</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>110</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_Change_lang</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>pushButton_2</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>107</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>30</x>
+     <y>130</y>
     </hint>
    </hints>
   </connection>
