@@ -65,16 +65,16 @@ class Ui_MainWindow(object):
         self.dashboard_btn_1.setAutoExclusive(True)
         self.dashboard_btn_1.setObjectName("dashboard_btn_1")
         self.verticalLayout_2.addWidget(self.dashboard_btn_1)
-        self.pushButton_2 = QtWidgets.QPushButton(self.icon_only_widget)
-        self.pushButton_2.setText("")
+        self.pushButton_2_change_language = QtWidgets.QPushButton(self.icon_only_widget)
+        self.pushButton_2_change_language.setText("")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/icon/icon/product-32.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         icon2.addPixmap(QtGui.QPixmap(":/icon/icon/product-48.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        self.pushButton_2.setIcon(icon2)
-        self.pushButton_2.setCheckable(True)
-        self.pushButton_2.setAutoExclusive(True)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.verticalLayout_2.addWidget(self.pushButton_2)
+        self.pushButton_2_change_language.setIcon(icon2)
+        self.pushButton_2_change_language.setCheckable(True)
+        self.pushButton_2_change_language.setAutoExclusive(True)
+        self.pushButton_2_change_language.setObjectName("pushButton_2_change_language")
+        self.verticalLayout_2.addWidget(self.pushButton_2_change_language)
         self.verticalLayout_3.addLayout(self.verticalLayout_2)
         spacerItem = QtWidgets.QSpacerItem(20, 373, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem)
@@ -395,8 +395,8 @@ class Ui_MainWindow(object):
         self.change_btn.toggled['bool'].connect(self.full_menu_widget.setHidden) # type: ignore
         self.exit_btn_2.clicked.connect(MainWindow.close) # type: ignore
         self.exit_btn_1.clicked.connect(MainWindow.close) # type: ignore
-        self.pushButton_2.clicked['bool'].connect(self.pushButton_Change_lang.toggle) # type: ignore
-        self.pushButton_Change_lang.clicked['bool'].connect(self.pushButton_2.toggle) # type: ignore
+        self.pushButton_2_change_language.clicked['bool'].connect(self.pushButton_Change_lang.toggle) # type: ignore
+        self.pushButton_Change_lang.clicked['bool'].connect(self.pushButton_2_change_language.toggle) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

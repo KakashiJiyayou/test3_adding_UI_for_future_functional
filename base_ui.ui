@@ -124,7 +124,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="pushButton_2_change_language">
            <property name="text">
             <string/>
            </property>
@@ -1047,7 +1047,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>pushButton_2_change_language</sender>
    <signal>clicked(bool)</signal>
    <receiver>pushButton_Change_lang</receiver>
    <slot>toggle()</slot>
@@ -1065,7 +1065,7 @@
   <connection>
    <sender>pushButton_Change_lang</sender>
    <signal>clicked(bool)</signal>
-   <receiver>pushButton_2</receiver>
+   <receiver>pushButton_2_change_language</receiver>
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
