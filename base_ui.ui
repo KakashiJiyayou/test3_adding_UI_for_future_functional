@@ -633,30 +633,27 @@
         </widget>
         <widget class="QWidget" name="download_page">
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="4" column="0">
-           <widget class="QWidget" name="show_result_widget" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_12">
-             <item>
-              <widget class="QPlainTextEdit" name="plainText_show"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QWidget" name="widget_for_scroll_download_page" native="true">
+          <item row="0" column="0">
+           <widget class="QWidget" name="search_widget" native="true">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>150</height>
+              <height>10</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>150</height>
+              <height>100</height>
              </size>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(213, 246, 255)</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
              <property name="spacing">
               <number>0</number>
              </property>
@@ -672,24 +669,6 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item>
-              <widget class="QScrollArea" name="scrollArea_2_edit_page">
-               <property name="widgetResizable">
-                <bool>true</bool>
-               </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents_3">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>535</width>
-                  <height>148</height>
-                 </rect>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_6"/>
-               </widget>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
@@ -866,27 +845,60 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QWidget" name="search_widget" native="true">
+          <item row="4" column="0">
+           <widget class="QWidget" name="show_result_widget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <item>
+              <widget class="QPlainTextEdit" name="plainText_show"/>
+             </item>
+             <item>
+              <widget class="QProgressBar" name="progressBar">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>15</pointsize>
+                </font>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::DefaultContextMenu</enum>
+               </property>
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="value">
+                <number>93</number>
+               </property>
+               <property name="textVisible">
+                <bool>true</bool>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="invertedAppearance">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QWidget" name="widget_for_scroll_download_page" native="true">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>10</height>
+              <height>150</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>100</height>
+              <height>150</height>
              </size>
             </property>
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color:rgb(213, 246, 255)</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
              <property name="spacing">
               <number>0</number>
              </property>
@@ -902,6 +914,24 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
+             <item>
+              <widget class="QScrollArea" name="scrollArea_2_edit_page">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_3">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>535</width>
+                  <height>148</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_6"/>
+               </widget>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
