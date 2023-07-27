@@ -867,8 +867,11 @@
                <property name="autoFillBackground">
                 <bool>true</bool>
                </property>
+               <property name="maximum">
+                <number>0</number>
+               </property>
                <property name="value">
-                <number>93</number>
+                <number>-1</number>
                </property>
                <property name="textVisible">
                 <bool>true</bool>
