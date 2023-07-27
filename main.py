@@ -578,8 +578,9 @@ class MainWindow( QMainWindow ):
         #
         self.Upload_Button_Clicked = True
 
-        # disble upload button 
+        # disble upload button  and sidebar
         self.ui.pushButton_upload.setDisabled ( True )
+        self.diasble_side_bar (  )
 
         # 
         self.show_dialog_chosing_file()
