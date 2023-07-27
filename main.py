@@ -349,6 +349,11 @@ class MainWindow( QMainWindow ):
 
     def removed (self):
         print ( "File removed")
+        self.ui.plainText_show.setPlainText ( "内容删除成功(Removed content successful)" )
+        
+        self.clear_search_realted_variables()
+        
+
 
     
 
@@ -364,7 +369,6 @@ class MainWindow( QMainWindow ):
 
     ## when user clicked remove push button
     def on_pushButton_download_pressed ( self ):
-
 
         search_input = self.ui.search_input.text(  ).strip ( )
 
@@ -395,6 +399,11 @@ class MainWindow( QMainWindow ):
                 self.show_popup_text ( "File not selected", "First type text in search area then choose the file you want to make changes")
             else :
                 self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
+
+        self.ui.plainText_show.setPlainText ("(Process finished)处理完成")
+        self.clear_search_realted_variables ()
+
+        
 
     def download_proccess (self, bypy_path, local_path, progress_callback):
         bypy_path = "ONDUP" + bypy_path
@@ -510,6 +519,7 @@ class MainWindow( QMainWindow ):
             new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
             new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
 
+
             if "_copy(" in new_file_name_witout_extension :
                 head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
                 new_file_name_witout_extension = head
@@ -535,15 +545,15 @@ class MainWindow( QMainWindow ):
             file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
 
             if file_uploaded :
-                new_file_path_bypy += "/" + new_file_name
+                new_file_path_bypy +=  new_file_name
                 list1 = [ new_file_path_bypy ]
                 insert_db = Database.insert_dir_list( list1, menu )
                 print (" file uplaoded done , insert_db ", insert_db)
-                progress_callback.emit ( "file upload done ")
+                progress_callback.emit ( "(file upload done )文件上传完成")
 
             else:
                 print ("failed to uplaod file")
-                progress_callback.emit ( "failled to upload file" )
+                progress_callback.emit ( "(failled to upload file)文件上传失败" )
 
             # clear temp dir
             print ( M_upload.clear_temp_dir () )
@@ -562,6 +572,10 @@ class MainWindow( QMainWindow ):
         # Enable:: sidebar, group 2
         self.enable_show_ge2 ()
         self.enable_side_bar ()
+
+        # clear search 
+        self.clear_search_realted_variables ()
+
 
 
     ## ----------------------------------------------------------------------------/>
@@ -635,6 +649,7 @@ class MainWindow( QMainWindow ):
 
         # disble upload button 
         self.ui.pushButton_upload.setEnabled ( True )
+        self.enable_side_bar ()
 
     ##
     def folder_chosen(self):
@@ -753,7 +768,7 @@ class MainWindow( QMainWindow ):
         # use subproccess to uplaod 
         self.suproccess_show_plaintext ( command, progress_callback)
         
-        progress_callback.emit( "uploading to baidu is done" )
+        progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成" )
         
         # clearing temp directory
         print ( " Clear temp folder ", M_upload.clear_temp_dir() )
@@ -767,8 +782,9 @@ class MainWindow( QMainWindow ):
         # enable upload button
         self.ui.pushButton_upload.setEnabled(True)
 
-        #  
+        # enable upload button and side bar
         self.Upload_Button_Clicked = False
+        self.enable_side_bar (  )
 
 
 
@@ -805,7 +821,7 @@ class MainWindow( QMainWindow ):
             progress_callback.emit("menu not selected")
         else :
             self.unzip_upload_insert ( file_path, all_text, progress_callback )
-            progress_callback.emit("menu  selected")
+            # progress_callback.emit("menu  selected")
 
         #
         # if (self.M_Uplaod.is_zip_file(file_path)):
@@ -1201,6 +1217,12 @@ class MainWindow( QMainWindow ):
             widget.setDisabled()
         else:
             widget.setEnabled()
+
+    # clear search area 
+    def clear_search_realted_variables (self):
+        self._search_path_list = []
+        self.update_search_path ()
+        self.ui.search_input.clear ()
 
 
 
