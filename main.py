@@ -520,13 +520,26 @@ class MainWindow( QMainWindow ):
 
                 self.update_progressbar ( 30 ) ############## update progressbar
 
-                # connect worker 
-                worker = WorkQT.Worker ( self.update_ongoing_proccess ,
-                                        new_file_location_pc , new_file_path_bypy, new_file_name, menu   )
-                worker.signals.progress.connect ( self.update_show_progress )
-                worker.signals.finished.connect ( self.update_complete )
+
+                ## NOTE let's match selected and old file name
+                selected_file_extension = os.path.splitext( new_file_location_pc )[ 1 ]
+                print ( "on_pushButton_update_pressed  selected_file_extension ", 
+                       selected_file_extension )
                 
-                self.threadpool.start ( worker )
+                if selected_file_extension in new_file_name:
+                    # connect worker 
+                    worker = WorkQT.Worker ( self.update_ongoing_proccess ,
+                                            new_file_location_pc , new_file_path_bypy, new_file_name, menu   )
+                    worker.signals.progress.connect ( self.update_show_progress )
+                    worker.signals.finished.connect ( self.update_complete )
+                    
+                    self.threadpool.start ( worker )
+                else:
+                    self.update_progressbar ( 100 ) ############## update progressbar
+                    self.show_popup_text ( "Extension Error","Chosen file are not same type 選擇的文件類型不同" )
+                    
+
+
             else:
                 self.update_progressbar ( 100 ) ############## update progressbar
         else :
@@ -606,7 +619,7 @@ class MainWindow( QMainWindow ):
                 list1 = [ new_file_path_bypy ]
                 insert_db = Database.insert_dir_list( list1, menu )
                 print (" file uplaoded done , insert_db ", insert_db)
-                progress_callback.emit ( "(file upload done )文件上传完成")
+                progress_callback.emit ( "(file upload done )文件上传完成" + str (new_file_path_bypy) )
 
             else:
                 print ("failed to uplaod file")
@@ -1335,8 +1348,18 @@ class MainWindow( QMainWindow ):
         if percentage_done == 0 or percentage_done == 100:
             time.sleep (2)
             self.ui.progressBar.hide ()
+
+            self.enable_show_g1 ()
+            self.enable_show_ge2 ()
+            self.enable_side_bar()
+            
+
         elif percentage_done >0 and percentage_done < 100:
             self.ui.progressBar.setVisible ( True )
+            
+            self.disable_g1 ()
+            self.disable_ge2()
+            self.diasble_side_bar()
 
 
 

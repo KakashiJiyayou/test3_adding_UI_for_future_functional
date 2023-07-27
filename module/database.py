@@ -29,7 +29,9 @@ def insert_dir_list( list, menu = None ):
     insert_done = False
     status = None
 
-    for path in list:
+    path = list
+    if path:
+        print ("insert DB path  for path in list", path)
 
         status = "Error"
         insert_done = False
