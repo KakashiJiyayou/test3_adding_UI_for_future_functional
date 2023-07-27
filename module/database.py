@@ -36,7 +36,7 @@ def insert_dir_list( list, menu = None ):
 
         #first check whether value exist or not
         try:
-         path_exists = dir_list_table.count ( query.path == path )
+            path_exists = dir_list_table.count ( query.path == path )
         except:
             path_exists = False
             print (" Error while counting in 'path_exists'")

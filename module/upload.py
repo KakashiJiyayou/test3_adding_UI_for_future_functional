@@ -72,6 +72,7 @@ def start_unzipping( path ):
     except:
         unzipped = False
         status = "Could not unzipped"
+        traceback.print_exc()
 
     json_value = { "start_unzipping" : unzipped , "status" : status }
 

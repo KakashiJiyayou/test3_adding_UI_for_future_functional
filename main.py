@@ -1,5 +1,6 @@
 import os
 import  sys
+import ntpath
 from PyQt5.QtWidgets import  *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -120,6 +121,7 @@ class MainWindow( QMainWindow ):
         # make_goup_one visible and enable
         self.update_page_status ()
         self.hide_some_ui ()
+        self.update_progressbar (0)
     
     ## Group1 
     def enable_show_g1 ( self ):
@@ -269,6 +271,9 @@ class MainWindow( QMainWindow ):
     ## when user clicked remove push button
     def on_pushButton_remove_pressed ( self ):
 
+        # update progressbar
+        self.update_progressbar ( 1 )
+
         # show message_box do they really want to delete
         dlg = QMessageBox(self)
 
@@ -282,8 +287,11 @@ class MainWindow( QMainWindow ):
             dlg.setText("您确定愿意删除内容吗 ??")
             dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
           
+        
 
         button = dlg.exec ()
+        # update progressbar
+        self.update_progressbar ( 20 )
 
 
         if button == QMessageBox.Yes :
@@ -300,6 +308,10 @@ class MainWindow( QMainWindow ):
                 dlg1.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
             
             button1 = dlg1.exec ()
+
+            # update progressbar
+            self.update_progressbar ( 30 )
+
             if button1 == QMessageBox.Yes :
                 print ( "Removing Contents" )
 
@@ -324,9 +336,14 @@ class MainWindow( QMainWindow ):
                     else :
                         self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
 
-
+        else:
+            # update progressbar
+            self.update_progressbar ( 100 )
 
     def remove_proccess(self, path , progress_callback):
+
+        # update progressbar
+        self.update_progressbar ( 40 )
 
         # lets get path and the file name
         head, tail = os.path.split ( path )
@@ -337,6 +354,8 @@ class MainWindow( QMainWindow ):
 
         file_exists = self.subproccess_check_file_exists2 ( tail, head, progress_callback  )
 
+        self.update_progressbar ( 80 ) ############## update progressbar
+
         if file_exists :
             print ( " failled to remove " )
         else :
@@ -344,6 +363,7 @@ class MainWindow( QMainWindow ):
             print ( Database.delete_path_list ( path ) )
 
             pass
+        self.update_progressbar ( 90 ) ############## update progressbar
 
 
 
@@ -352,6 +372,7 @@ class MainWindow( QMainWindow ):
         self.ui.plainText_show.setPlainText ( "内容删除成功(Removed content successful)" )
         
         self.clear_search_realted_variables()
+        self.update_progressbar ( 100 ) ############## update progressbar
         
 
 
@@ -374,25 +395,32 @@ class MainWindow( QMainWindow ):
 
         if search_input :
 
+            self.update_progressbar ( 1 ) ############## update progressbar
+
             print ( "user selected contents ", search_input )
 
             # get value from search input
             path = search_input.split( "  Directory:" ) [1]
             print ( "Selected Path " , path)
 
+            self.update_progressbar ( 3 ) ############## update progressbar
+
             # show folder opening option
             fname = QFileDialog.getExistingDirectory(self, 'Select Folder')
 
 
+            self.update_progressbar ( 11 ) ############## update progressbar
 
             if fname:
                 print ( "Selected path " , fname)
                 worker = WorkQT.Worker (self.download_proccess, path, fname)
                 worker.signals.progress.connect ( self.download_progress )
+                worker.signals.finished.connect ( self.download_finished )
                 self.threadpool.start ( worker )
                 
             else:
                 print ( "User did not chose anything " )
+                self.update_progressbar ( 100 ) ############## update progressbar
         
         else :
             if self._is_english:
@@ -406,12 +434,19 @@ class MainWindow( QMainWindow ):
         
 
     def download_proccess (self, bypy_path, local_path, progress_callback):
+        self.update_progressbar ( 33 ) ############## update progressbar
         bypy_path = "ONDUP" + bypy_path
         command = [ "bypy", "download", bypy_path, local_path  ]
+        self.update_progressbar ( 41 ) ############## update progressbar
         self.suproccess_show_plaintext ( command, progress_callback)
+
 
     def download_progress (self, s):
         self.ui.plainText_show.setPlainText (s)
+
+    
+    def download_finished( self ):
+        self.update_progressbar ( 100 ) ############## update progressbar
 
 
     ## later need to use worker signal to the background work
@@ -429,7 +464,9 @@ class MainWindow( QMainWindow ):
         # check the text vlaue in search input
         search_input = self.ui.search_input.text(  ).strip ( )
         
-        if search_input :
+        if search_input and "Directory" in search_input :
+
+            self.update_progressbar ( 1 ) ############## update progressbar
 
             print ( "user selected contents ", search_input )
 
@@ -449,6 +486,9 @@ class MainWindow( QMainWindow ):
             menu = result[0][ "sku_filter" ]
             print ( "Menu for update ", menu )
 
+
+            self.update_progressbar ( 10 ) ############## update progressbar
+
             # ask user permission to open file
             dlg = QMessageBox(self)
 
@@ -459,6 +499,8 @@ class MainWindow( QMainWindow ):
             else:
                 dlg.setWindowTitle("选择文件")
                 dlg.setText("选择要上传的文件")
+
+            self.update_progressbar ( 20 ) ############## update progressbar
 
             dlg.setStandardButtons ( QMessageBox.Yes |  QMessageBox.No )
             button = dlg.exec ()
@@ -476,6 +518,8 @@ class MainWindow( QMainWindow ):
                 new_file_path_bypy = path.replace ( new_file_name, "" )
                 print ( "new file path bypy", new_file_path_bypy )
 
+                self.update_progressbar ( 30 ) ############## update progressbar
+
                 # connect worker 
                 worker = WorkQT.Worker ( self.update_ongoing_proccess ,
                                         new_file_location_pc , new_file_path_bypy, new_file_name, menu   )
@@ -483,12 +527,13 @@ class MainWindow( QMainWindow ):
                 worker.signals.finished.connect ( self.update_complete )
                 
                 self.threadpool.start ( worker )
+            else:
+                self.update_progressbar ( 100 ) ############## update progressbar
         else :
             if self._is_english:
                 self.show_popup_text ( "File not selected", "First type text in search area then choose the file you want to make changes")
             else :
                 self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
-
 
 
 
@@ -500,6 +545,8 @@ class MainWindow( QMainWindow ):
         self.disable_ge2 ()
         self.diasble_side_bar () 
 
+        self.update_progressbar ( 33 ) ############## update progressbar
+
         if not len (  new_file_location_pc ) < 3:
             
             print("Given file path ", new_file_location_pc)
@@ -509,6 +556,8 @@ class MainWindow( QMainWindow ):
             print ( "Clear temp dir ", M_upload.clear_temp_dir())
             moduel_path  = M_upload.get_directory_path ()
             shutil.copy ( new_file_location_pc , moduel_path )
+
+            self.update_progressbar ( 36 ) ############## update progressbar
 
 
             # get selected file name
@@ -535,14 +584,22 @@ class MainWindow( QMainWindow ):
             # rename document 
             M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
 
+            self.update_progressbar ( 45 ) ############## update progressbar
+
             # get upload cmmand
             command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
+
+            self.update_progressbar ( 55 ) ############## update progressbar
 
             # NOTE - Update Document using subprocces
             self.suproccess_show_plaintext ( command, progress_callback )
 
+            self.update_progressbar ( 80 ) ############## update progressbar
+
             # check file upload succcesfull 
             file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
+
+            self.update_progressbar ( 90 ) ############## update progressbar
 
             if file_uploaded :
                 new_file_path_bypy +=  new_file_name
@@ -555,8 +612,12 @@ class MainWindow( QMainWindow ):
                 print ("failed to uplaod file")
                 progress_callback.emit ( "(failled to upload file)文件上传失败" )
 
+            self.update_progressbar ( 97 ) ############## update progressbar
+
             # clear temp dir
             print ( M_upload.clear_temp_dir () )
+
+            self.update_progressbar ( 98 ) ############## update progressbar
 
 
 
@@ -575,6 +636,8 @@ class MainWindow( QMainWindow ):
 
         # clear search 
         self.clear_search_realted_variables ()
+
+        self.update_progressbar ( 100 ) ############## update progressbar
 
 
 
@@ -701,10 +764,12 @@ class MainWindow( QMainWindow ):
     ##
     def unzip_upload_insert( self, path , menu , progress_callback ):
 
-        print ("Menu given ", menu)
+        print ("unzip_upload_insert \t\tMenu given ", menu, " \t path", path)
 
         # checking giving path belongs to a zip
         is_zip_file = M_upload.is_zip_file( path )
+
+        print ( "unzip_upload_insert is_zip_file" , is_zip_file)
         if is_zip_file :
             # clearing temp folder
             clear_dir = M_upload.clear_temp_dir() 
@@ -713,24 +778,29 @@ class MainWindow( QMainWindow ):
             # unzip
             result = M_upload.start_unzipping ( path )
 
+            print ( "unzip_upload_insert zipped", result )
+
             # if unzip succesfull
             if result[ "start_unzipping" ]:
                 print ( "Unzipped , will uplaod to baidu ")
 
             progress_callback.emit( "Unzipped" )
 
-        
         else :
             if not self._folder_chosen:
                 M_upload.clear_temp_dir()
                 modue_path = M_upload.get_directory_path ()
                 shutil.copy( path, modue_path )
         
+        self.update_progressbar ( 19 ) ############## update progressbar
+
+
         progress_callback.emit( "uploading to baidu" )
 
         folder_list = M_upload.get_folder_list ()
+
         for item in folder_list :
-            temp_file_name = item.strip ("/")
+            temp_file_name = ntpath.basename ( str(item) )
             # get selected file name
             new_file_name_witout_extension = os.path.splitext ( temp_file_name )[ 0 ]
             new_file_only_extension = os.path.splitext( temp_file_name )[ 1 ]
@@ -739,25 +809,29 @@ class MainWindow( QMainWindow ):
                 head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
                 new_file_name_witout_extension = head
 
-
             now = datetime.datetime.now()
             now = now.strftime('%m-%d-%y_%H-%M')
             new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
             new_file_name = new_file_name_witout_extension + new_file_only_extension
             print ( "new file name  after adding extension and date ", new_file_name  )
 
-            if self.subproccess_check_file_exists ( temp_file_name, progress_callback ) :
+            progress_callback.emit ( "checking content exists or not 檢查內容是否存在 \t" +str ( new_file_name ) )
+
+            if self.subproccess_check_file_exists ( "/bypy/ONDUP/" + new_file_name, progress_callback ) :
                 print (" unzip_upload_insert file name exists " , temp_file_name )
                 # rename document 
                 M_upload.rename_file_in_temp ( temp_file_name, new_file_name )
             else:
                 print (" unzip_upload_insert file name does not exists ",temp_file_name  )
+
                 
-                
+        self.update_progressbar ( 29 ) ############## update progressbar        
 
         folder_list = M_upload.get_folder_list ()
         print (" unzip_upload_insert ", folder_list)
 
+
+        self.update_progressbar ( 31 ) ############## update progressbar
 
         # # check same file name exists or not 
         # file_exists= self.subproccess_check_file_exists ( new_file_name, progress_callback )
@@ -765,19 +839,37 @@ class MainWindow( QMainWindow ):
         # call upload module get the path
         command = M_upload.get_bypy_upload_command ()
 
+        self.update_progressbar ( 40 ) ############## update progressbar
+
+        barv = 40
+        barIndex = 0
+
         # use subproccess to uplaod 
         self.suproccess_show_plaintext ( command, progress_callback)
-        
-        progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成" )
+
+        for item in folder_list :
+
+            temp_file_name = ntpath.basename ( str(item) )
+            progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成 " +  str ( temp_file_name ) )
+
+            head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+            new_file_name_witout_extension = head
+            #  check file inserted or not
+            if self.subproccess_check_file_exists ( temp_file_name, progress_callback ):
+                # insterting data
+                insert_result = Database.insert_dir_list ( item, menu )
+                print ( "DB insert result" , insert_result )
+            
+            if barIndex == 10 :
+                barv = barv + 1
+                self.update_progressbar ( barv ) ############## update progressbar
+                barIndex = 0
+            barIndex = barIndex + 1
+            
         
         # clearing temp directory
         print ( " Clear temp folder ", M_upload.clear_temp_dir() )
 
-        # insterting data
-        
-        insert_result = Database.insert_dir_list ( folder_list, menu )
-        
-        print ( "DB insert result" , insert_result )
 
         # enable upload button
         self.ui.pushButton_upload.setEnabled(True)
@@ -794,6 +886,8 @@ class MainWindow( QMainWindow ):
         
         # show thar process starte
         progress_callback.emit("Process started")
+
+        self.update_progressbar ( 1 ) ############## update progressbar
 
         # first check all the comboxes selected or not
         all_comboboxes_selected = False
@@ -819,9 +913,15 @@ class MainWindow( QMainWindow ):
         # if comboboxes are not all set show message
         if not all_comboboxes_selected :
             progress_callback.emit("menu not selected")
+
+            self.update_progressbar ( 100 ) ############## update progressbar
+
         else :
+            self.update_progressbar ( 19 ) ############## update progressbar
+
             self.unzip_upload_insert ( file_path, all_text, progress_callback )
             # progress_callback.emit("menu  selected")
+
 
         #
         # if (self.M_Uplaod.is_zip_file(file_path)):
@@ -852,6 +952,8 @@ class MainWindow( QMainWindow ):
     ## thread complete
     def thread_complete(self):
         print("Thread for uplaod done")
+
+        self.update_progressbar ( 100 ) ############## update progressbar
 
 
 
@@ -1223,6 +1325,18 @@ class MainWindow( QMainWindow ):
         self._search_path_list = []
         self.update_search_path ()
         self.ui.search_input.clear ()
+
+
+    # progress bar showing , hide and bar changing
+    def update_progressbar( self, percentage_done ):
+
+        self.ui.progressBar.setValue ( percentage_done )
+
+        if percentage_done == 0 or percentage_done == 100:
+            time.sleep (2)
+            self.ui.progressBar.hide ()
+        elif percentage_done >0 and percentage_done < 100:
+            self.ui.progressBar.setVisible ( True )
 
 
 
