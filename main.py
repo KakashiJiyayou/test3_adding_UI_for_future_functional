@@ -1468,6 +1468,8 @@ if __name__ == "__main__":
 
     window = MainWindow()
     window.show()
+    window.setWindowIcon(QIcon('icon/Logo.png'))
+    app.setWindowIcon(QIcon('icon/Logo.png'))
 
     sys.exit(app.exec())
 
