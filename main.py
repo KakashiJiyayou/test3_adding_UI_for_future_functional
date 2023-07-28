@@ -1346,13 +1346,12 @@ class MainWindow( QMainWindow ):
         self.ui.progressBar.setValue ( percentage_done )
 
         if percentage_done == 0 or percentage_done == 100:
-            time.sleep (2)
-            self.ui.progressBar.hide ()
-
             self.enable_show_g1 ()
             self.enable_show_ge2 ()
             self.enable_side_bar()
-            
+            time.sleep (2)
+            self.ui.progressBar.hide ()
+
 
         elif percentage_done >0 and percentage_done < 100:
             self.ui.progressBar.setVisible ( True )
