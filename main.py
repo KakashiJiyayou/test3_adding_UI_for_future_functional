@@ -119,9 +119,9 @@ class MainWindow( QMainWindow ):
         self.make_drop_down_menu()
 
         # make_goup_one visible and enable
+        self.update_progressbar (0)
         self.update_page_status ()
         self.hide_some_ui ()
-        self.update_progressbar (0)
     
     ## Group1 
     def enable_show_g1 ( self ):
@@ -174,6 +174,8 @@ class MainWindow( QMainWindow ):
     def hide_some_ui ( self ):
         self.ui.radioButton_addImage.setHidden ( True )
         self.ui.radioButton_newDoc.setHidden ( True )
+        self.ui.label_show.setHidden ( True )
+        self.ui.input_area.setHidden ( True )
 
 
 
@@ -804,6 +806,7 @@ class MainWindow( QMainWindow ):
                 M_upload.clear_temp_dir()
                 modue_path = M_upload.get_directory_path ()
                 shutil.copy( path, modue_path )
+                print ( "unzip inser folder chosen")
         
         self.update_progressbar ( 19 ) ############## update progressbar
 
