@@ -1471,5 +1471,7 @@ if __name__ == "__main__":
     window.setWindowIcon(QIcon('icon/Logo.png'))
     app.setWindowIcon(QIcon('icon/Logo.png'))
 
+    
+
     sys.exit(app.exec())
 
