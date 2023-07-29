@@ -161,6 +161,8 @@ class MainWindow( QMainWindow ):
         self.ui.home_btn_2.setEnabled ( True )
         self.ui.dashboard_btn_1.setEnabled ( True )
         self.ui.dashboard_btn_2.setEnabled ( True )
+        self.ui.change_btn.setEnabled ( True )
+        
 
 
     ## Group side bar disable
@@ -169,6 +171,7 @@ class MainWindow( QMainWindow ):
         self.ui.home_btn_2.setEnabled ( False )
         self.ui.dashboard_btn_1.setEnabled ( False )
         self.ui.dashboard_btn_2.setEnabled ( False )
+        self.ui.change_btn.setEnabled ( False )
 
     ## hide some elements
     def hide_some_ui ( self ):
@@ -376,6 +379,7 @@ class MainWindow( QMainWindow ):
         self.clear_search_realted_variables()
         self.update_progressbar ( 100 ) ############## update progressbar
         
+        self.disable_g1 ()
 
 
     
@@ -449,7 +453,7 @@ class MainWindow( QMainWindow ):
     
     def download_finished( self ):
         self.update_progressbar ( 100 ) ############## update progressbar
-
+        self.disable_g1 ()
 
     ## later need to use worker signal to the background work
 
@@ -653,7 +657,7 @@ class MainWindow( QMainWindow ):
         self.clear_search_realted_variables ()
 
         self.update_progressbar ( 100 ) ############## update progressbar
-
+        self.disable_g1 ()
 
 
     ## ----------------------------------------------------------------------------/>
@@ -971,6 +975,7 @@ class MainWindow( QMainWindow ):
 
         self.update_progressbar ( 100 ) ############## update progressbar
 
+        self.disable_ge2 ()
 
 
     # END--------------------------------------------------------------------------/>

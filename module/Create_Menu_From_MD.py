@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 
 
 def get_json_for_menu():
-    file_path = "./DB/menu.md"
+    file_path = ".\\DB\\menu.md"
     with open(file_path, encoding="utf-8") as file:
         ast = CommonMark.DocParser().parse(file.read())
         dictionary = CMarkASTNester().nest(ast)
@@ -27,6 +27,6 @@ def get_json_for_menu():
 
 
 def create_menu_json_file(jason_value):
-    with open('./DB/data_menu.json', 'w', encoding='utf-8') as f:
+    with open('.\\DB\\data_menu.json', 'w', encoding='utf-8') as f:
         json.dump(jason_value, f, ensure_ascii=False, indent=4)
         f.close()
