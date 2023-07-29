@@ -784,107 +784,107 @@ class MainWindow( QMainWindow ):
     def unzip_upload_insert( self, path , menu , progress_callback ):
 
         print ("unzip_upload_insert \t\tMenu given ", menu, " \t path", path)
+        if len(path) >5:
+            # checking giving path belongs to a zip
+            is_zip_file = M_upload.is_zip_file( path )
 
-        # checking giving path belongs to a zip
-        is_zip_file = M_upload.is_zip_file( path )
+            print ( "unzip_upload_insert is_zip_file" , is_zip_file)
+            if is_zip_file :
+                # clearing temp folder
+                clear_dir = M_upload.clear_temp_dir()
+                print ( "clear_dir ", clear_dir["clear_temp_dir"] )
+                progress_callback.emit ( "clear_dir"  )
+                # unzip
+                result = M_upload.start_unzipping ( path )
 
-        print ( "unzip_upload_insert is_zip_file" , is_zip_file)
-        if is_zip_file :
-            # clearing temp folder
-            clear_dir = M_upload.clear_temp_dir() 
-            print ( "clear_dir ", clear_dir["clear_temp_dir"] )
-            progress_callback.emit ( "clear_dir"  )
-            # unzip
-            result = M_upload.start_unzipping ( path )
+                print ( "unzip_upload_insert zipped", result )
 
-            print ( "unzip_upload_insert zipped", result )
+                # if unzip succesfull
+                if result[ "start_unzipping" ]:
+                    print ( "Unzipped , will uplaod to baidu ")
 
-            # if unzip succesfull
-            if result[ "start_unzipping" ]:
-                print ( "Unzipped , will uplaod to baidu ")
+                progress_callback.emit( "Unzipped" )
 
-            progress_callback.emit( "Unzipped" )
+            else :
+                if not self._folder_chosen:
+                    M_upload.clear_temp_dir()
+                    modue_path = M_upload.get_directory_path ()
+                    shutil.copy( path, modue_path )
+                    print ( "unzip inser folder chosen")
 
-        else :
-            if not self._folder_chosen:
-                M_upload.clear_temp_dir()
-                modue_path = M_upload.get_directory_path ()
-                shutil.copy( path, modue_path )
-                print ( "unzip inser folder chosen")
-        
-        self.update_progressbar ( 19 ) ############## update progressbar
+            self.update_progressbar ( 19 ) ############## update progressbar
 
 
-        progress_callback.emit( "uploading to baidu" )
+            progress_callback.emit( "uploading to baidu" )
 
-        folder_list = M_upload.get_folder_list ()
+            folder_list = M_upload.get_folder_list ()
 
-        for item in folder_list :
-            temp_file_name = ntpath.basename ( str(item) )
-            # get selected file name
-            new_file_name_witout_extension = os.path.splitext ( temp_file_name )[ 0 ]
-            new_file_only_extension = os.path.splitext( temp_file_name )[ 1 ]
+            for item in folder_list :
+                temp_file_name = ntpath.basename ( str(item) )
+                # get selected file name
+                new_file_name_witout_extension = os.path.splitext ( temp_file_name )[ 0 ]
+                new_file_only_extension = os.path.splitext( temp_file_name )[ 1 ]
 
-            if "_copy(" in new_file_name_witout_extension :
+                if "_copy(" in new_file_name_witout_extension :
+                    head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+                    new_file_name_witout_extension = head
+
+                now = datetime.datetime.now()
+                now = now.strftime('%m-%d-%y_%H-%M')
+                new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
+                new_file_name = new_file_name_witout_extension + new_file_only_extension
+                print ( "new file name  after adding extension and date ", new_file_name  )
+
+                progress_callback.emit ( "checking content exists or not 檢查內容是否存在 \t" +str ( new_file_name ) )
+
+                if self.subproccess_check_file_exists ( "/bypy/ONDUP/" + new_file_name, progress_callback ) :
+                    print (" unzip_upload_insert file name exists " , temp_file_name )
+                    # rename document
+                    M_upload.rename_file_in_temp ( temp_file_name, new_file_name )
+                else:
+                    print (" unzip_upload_insert file name does not exists ",temp_file_name  )
+
+
+            self.update_progressbar ( 29 ) ############## update progressbar
+
+            folder_list = M_upload.get_folder_list ()
+            print (" unzip_upload_insert ", folder_list)
+
+
+            self.update_progressbar ( 31 ) ############## update progressbar
+
+            # # check same file name exists or not
+            # file_exists= self.subproccess_check_file_exists ( new_file_name, progress_callback )
+
+            # call upload module get the path
+            command = M_upload.get_bypy_upload_command ()
+
+            self.update_progressbar ( 40 ) ############## update progressbar
+
+            barv = 40
+            barIndex = 0
+
+            # use subproccess to uplaod
+            self.suproccess_show_plaintext ( command, progress_callback)
+
+            for item in folder_list :
+
+                temp_file_name = ntpath.basename ( str(item) )
+                progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成 " +  str ( temp_file_name ) )
+
                 head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
                 new_file_name_witout_extension = head
+                #  check file inserted or not
+                if self.subproccess_check_file_exists ( temp_file_name, progress_callback ):
+                    # insterting data
+                    insert_result = Database.insert_dir_list ( item, menu )
+                    print ( "DB insert result" , insert_result )
 
-            now = datetime.datetime.now()
-            now = now.strftime('%m-%d-%y_%H-%M')
-            new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
-            new_file_name = new_file_name_witout_extension + new_file_only_extension
-            print ( "new file name  after adding extension and date ", new_file_name  )
-
-            progress_callback.emit ( "checking content exists or not 檢查內容是否存在 \t" +str ( new_file_name ) )
-
-            if self.subproccess_check_file_exists ( "/bypy/ONDUP/" + new_file_name, progress_callback ) :
-                print (" unzip_upload_insert file name exists " , temp_file_name )
-                # rename document 
-                M_upload.rename_file_in_temp ( temp_file_name, new_file_name )
-            else:
-                print (" unzip_upload_insert file name does not exists ",temp_file_name  )
-
-                
-        self.update_progressbar ( 29 ) ############## update progressbar        
-
-        folder_list = M_upload.get_folder_list ()
-        print (" unzip_upload_insert ", folder_list)
-
-
-        self.update_progressbar ( 31 ) ############## update progressbar
-
-        # # check same file name exists or not 
-        # file_exists= self.subproccess_check_file_exists ( new_file_name, progress_callback )
-
-        # call upload module get the path
-        command = M_upload.get_bypy_upload_command ()
-
-        self.update_progressbar ( 40 ) ############## update progressbar
-
-        barv = 40
-        barIndex = 0
-
-        # use subproccess to uplaod 
-        self.suproccess_show_plaintext ( command, progress_callback)
-
-        for item in folder_list :
-
-            temp_file_name = ntpath.basename ( str(item) )
-            progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成 " +  str ( temp_file_name ) )
-
-            head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
-            new_file_name_witout_extension = head
-            #  check file inserted or not
-            if self.subproccess_check_file_exists ( temp_file_name, progress_callback ):
-                # insterting data
-                insert_result = Database.insert_dir_list ( item, menu )
-                print ( "DB insert result" , insert_result )
-            
-            if barIndex == 10 :
-                barv = barv + 1
-                self.update_progressbar ( barv ) ############## update progressbar
-                barIndex = 0
-            barIndex = barIndex + 1
+                if barIndex == 10 :
+                    barv = barv + 1
+                    self.update_progressbar ( barv ) ############## update progressbar
+                    barIndex = 0
+                barIndex = barIndex + 1
             
         
         # clearing temp directory
@@ -1383,74 +1383,85 @@ class MainWindow( QMainWindow ):
     # NOTE - using subproccessing to do bypy work 
     def suproccess_show_plaintext ( self, command_list , progress_callback )  :
 
-        proc =  subprocess.Popen( command_list  , stdout=subprocess.PIPE )
+        try:
+            proc = subprocess.Popen(command_list, stdout=subprocess.PIPE)
 
-        while True:
-            line = proc.stdout.readline()
-            if not line:
-                break
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
 
-            # print ( "test:", line.rstrip() )
-            value = str ( line, "utf-8") 
-            print("subprocces ", value)
+                # print ( "test:", line.rstrip() )
+                value = str(line, "utf-8")
+                print("subprocces ", value)
 
-            progress_callback.emit ( value )
+                progress_callback.emit(value)
+        except :
+            print(traceback.format_exc())
+
 
 
     
     # NOTE - use subprocces  to check file exists or not
     def subproccess_check_file_exists ( self, file_name, progress_callback  ):
+        try:
+            text_Found = False
+            file_name_exists = False
 
-        text_Found = False
-        file_name_exists = False
+            print (" File name from subprocces ", file_name )
+            command = [ "bypy", "search", file_name ]
+            proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
 
-        print (" File name from subprocces ", file_name )
-        command = [ "bypy", "search", file_name ]
-        proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
-        while True:
-            line = proc.stdout.readline()
-            if not line:
-                break
+                # print ( "test:", line.rstrip() )
+                value = str ( line, "utf-8") .strip()
+                print("subprocces ", value)
+                progress_callback.emit ( value )
 
-            # print ( "test:", line.rstrip() )
-            value = str ( line, "utf-8") .strip()
-            print("subprocces ", value)
-            progress_callback.emit ( value )
+                if "Found" in value :
+                    text_Found = True
+                if text_Found and file_name in value:
+                    file_name_exists = True
 
-            if "Found" in value :
-                text_Found = True
-            if text_Found and file_name in value:
-                file_name_exists = True
-
-        if file_name_exists:
-            return True
+            if file_name_exists:
+                return True
+        except:
+            print(traceback.format_exc())
+            return  None
         
             
 
     def subproccess_check_file_exists2 ( self, file_name, remote_path ,progress_callback  ):
-        text_Found = False
-        file_name_exists = False
+        try:
+            text_Found = False
+            file_name_exists = False
 
-        print (" File name from subprocces ", file_name, "\t remote path ", remote_path )
-        command = [ "bypy", "search", file_name, remote_path ]
-        proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
-        while True:
-            line = proc.stdout.readline()
-            if not line:
-                break
+            print (" File name from subprocces ", file_name, "\t remote path ", remote_path )
+            command = [ "bypy", "search", file_name, remote_path ]
+            proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
 
-            # print ( "test:", line.rstrip() )
-            value = str ( line, "utf-8") .strip()
-            print("subprocces ", value)
-            progress_callback.emit ( value )
+                # print ( "test:", line.rstrip() )
+                value = str ( line, "utf-8") .strip()
+                print("subprocces ", value)
+                progress_callback.emit ( value )
 
-            if "Found" in value :
-                text_Found = True
-            if text_Found and file_name in value:
-                file_name_exists = True
+                if "Found" in value :
+                    text_Found = True
+                if text_Found and file_name in value:
+                    file_name_exists = True
 
-        if file_name_exists:
-            return True
+            if file_name_exists:
+                return True
+        except:
+            print(traceback.format_exc())
+            return  None
 
     ## ---------------------------------------------------------------------------------/>
     ## !SECTION
@@ -1458,9 +1469,6 @@ class MainWindow( QMainWindow ):
 """
  #NOTE END-Main Window---------------------------------Main Window------------------------------------------>      
 """
-
-
-
 
 ### start the app
 if __name__ == "__main__":
