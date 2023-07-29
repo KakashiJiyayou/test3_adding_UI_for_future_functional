@@ -250,6 +250,7 @@ class MainWindow( QMainWindow ):
             self.ui.pushButton_download.setText ( "Download" )
             self.ui.pushButton_upload.setText ( "Upload" )
             self.ui.search_btn.setText ( "Search" )
+            self.ui.pushButton_2_change_password.setText ( "Change Password" )
 
         else :
             self.ui.home_btn_2.setText ( "上传" )
@@ -261,6 +262,7 @@ class MainWindow( QMainWindow ):
             self.ui.pushButton_download.setText ( "下载" )
             self.ui.pushButton_upload.setText ( "上传" )
             self.ui.search_btn.setText ( "搜索" )
+            self.ui.pushButton_2_change_password.setText ("更改密碼")
 
 
 

@@ -124,6 +124,24 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="pushButton_3_change_password">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/icon/icon/group-32.ico</normaloff>
+             <normalon>:/icon/icon/group-48.ico</normalon>:/icon/icon/group-32.ico</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_2_change_language">
            <property name="text">
             <string/>
@@ -289,6 +307,24 @@
              <width>14</width>
              <height>14</height>
             </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_2_change_password">
+           <property name="text">
+            <string>Change Password</string>
+           </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/icon/icon/group-32.ico</normaloff>
+             <normalon>:/icon/icon/group-48.ico</normalon>:/icon/icon/group-32.ico</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -542,8 +578,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>45</width>
+                  <height>16</height>
                  </rect>
                 </property>
                </widget>
@@ -1019,8 +1055,8 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>207</x>
-     <y>39</y>
+     <x>218</x>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
      <x>60</x>
@@ -1035,8 +1071,8 @@
    <slot>setHidden(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>207</x>
-     <y>39</y>
+     <x>218</x>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
      <x>175</x>
@@ -1084,11 +1120,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>31</x>
-     <y>132</y>
+     <y>156</y>
     </hint>
     <hint type="destinationlabel">
-     <x>121</x>
-     <y>110</y>
+     <x>96</x>
+     <y>134</y>
     </hint>
    </hints>
   </connection>
@@ -1099,12 +1135,44 @@
    <slot>toggle()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>142</x>
-     <y>107</y>
+     <x>159</x>
+     <y>132</y>
     </hint>
     <hint type="destinationlabel">
      <x>30</x>
-     <y>130</y>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3_change_password</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButton_2_change_password</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>29</x>
+     <y>122</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>109</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2_change_password</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButton_3_change_password</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>81</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>34</x>
+     <y>134</y>
     </hint>
    </hints>
   </connection>
