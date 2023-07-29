@@ -162,6 +162,10 @@ class MainWindow( QMainWindow ):
         self.ui.dashboard_btn_1.setEnabled ( True )
         self.ui.dashboard_btn_2.setEnabled ( True )
         self.ui.change_btn.setEnabled ( True )
+        self.ui.pushButton_2_change_password.setEnabled ( True )
+        self.ui.pushButton_3_change_password.setEnabled ( True )
+        self.ui.pushButton_Change_lang.setEnabled ( True )
+        self.ui.pushButton_2_change_language.setEnabled ( True )
         
 
 
@@ -172,6 +176,10 @@ class MainWindow( QMainWindow ):
         self.ui.dashboard_btn_1.setEnabled ( False )
         self.ui.dashboard_btn_2.setEnabled ( False )
         self.ui.change_btn.setEnabled ( False )
+        self.ui.pushButton_2_change_password.setEnabled ( False )
+        self.ui.pushButton_3_change_password.setEnabled ( False )
+        self.ui.pushButton_Change_lang.setEnabled ( False )
+        self.ui.pushButton_2_change_language.setEnabled ( False )
 
     ## hide some elements
     def hide_some_ui ( self ):
