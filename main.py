@@ -1,11 +1,15 @@
 import os
 import  sys
+
+from module import package_management as _PM
+
+
 import ntpath
 from PyQt5.QtWidgets import  *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from functools import partial
-from resource_ui2 import Ui_MainWindow
+from resource_ui import Ui_MainWindow
 
 import shutil
 import time
@@ -15,10 +19,21 @@ import subprocess
 import traceback, sys
 
 
-from module import upload as M_upload
-from module import worker_pyqt as WorkQT
-from module import  database as Database
-from module import Create_Menu_From_MD as Read_Write_Menu 
+try:
+    from ctypes import windll  # Only exists on Windows.
+    myappid = 'gq.nigborobotic.filemanagment'
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+except ImportError:
+    pass
+
+try:
+    from module import upload as M_upload
+    from module import worker_pyqt as WorkQT
+    from module import database as Database
+    from module import Create_Menu_From_MD as Read_Write_Menu
+    from bypy import  ByPy
+except:
+    traceback.print_exc()
 
 """
 #NOTE Main Window---------------------------------Main Window------------------------------------------>  
@@ -224,12 +239,79 @@ class MainWindow( QMainWindow ):
         else:
             self.enable_show_ge2 ()
             self.disable_g1 ()
+            self.ui.pushButton_2_change_password
+            self.ui.pushButton_3_change_password
 
 
     ##  --------------------------------------------------------------------------/>
     ## !SECTION - Pagination
 
 
+
+    ## SECTION - Change password
+    ## ---------------------------------------------------------------------------->
+    def on_pushButton_2_change_password_pressed ( self):
+        self.change_password()
+
+    def on_pushButton_3_change_password_pressed ( self ):
+        self.change_password()
+
+    
+    def change_password ( self ):
+        self.ui.pushButton_2_change_password.setChecked ( True)
+        self.ui.pushButton_3_change_password.setChecked ( True)
+
+        password_ui = pass_w
+
+        new_given_password = password_ui.set_password ()
+
+        if not new_given_password ==  None and len ( new_given_password ) > 0:
+            self.diasble_side_bar ()
+            self.disable_g1 ()
+            self.disable_ge2 ()
+
+            try:
+                worker = WorkQT.Worker( self.change_password_procces, new_given_password )
+                worker.signals.finished.connect ( self.change_password_finsihed )
+                self.threadpool.start ( worker )
+            except:
+                traceback.print_exc ()
+
+            
+
+    def change_password_procces ( self,new_given_password , progress_callback ):
+
+        try:
+            password_check = CheckPassWord ()
+            self.update_progressbar (50)
+            new_given_password = new_given_password.strip ()
+            password_check.create_pass_at_pwd ( new_given_password )
+            path = M_upload.get_directory_path()
+            path = os.path.join( path, "pwd" )
+            print( "change passwor dprocces path ", path)
+            command = ["bypy", "delete", "/pwd/"]
+            self.suproccess_show_plaintext ( command, progress_callback )
+            time.sleep(2)
+            command = [ "bypy", "upload", path , "/pwd/" ]
+            self.suproccess_show_plaintext ( command, progress_callback )
+        except:
+            self.update_progressbar ( 100 )
+            self.enable_side_bar ()
+            self.enable_show_g1 ()
+            self.enable_show_ge2 ()
+            traceback.print_exc ()
+
+    
+    def change_password_finsihed ( self ):
+        self.ui.plainText_show ( "Password Changed 密碼已更改" )
+        self.update_progressbar ( 100 )
+        self.enable_side_bar ()
+        self.enable_show_g1 ()
+        self.enable_show_ge2 ()
+
+
+    ## ----------------------------------------------------------------------------/>
+    ## !SECTION - Change Passwor  
 
 
     ## SECTION - Change Language
@@ -669,6 +751,8 @@ class MainWindow( QMainWindow ):
         self.update_progressbar ( 100 ) ############## update progressbar
         self.disable_g1 ()
 
+        self.ui.plainText_show ("update done 更新完成")
+
 
     ## ----------------------------------------------------------------------------/>
     ## !SECTION - Update Action
@@ -855,13 +939,13 @@ class MainWindow( QMainWindow ):
                     print (" unzip_upload_insert file name does not exists ",temp_file_name  )
 
 
-            self.update_progressbar ( 29 ) ############## update progressbar
+            self.update_progressbar ( 20 ) ############## update progressbar
 
             folder_list = M_upload.get_folder_list ()
             print (" unzip_upload_insert ", folder_list)
 
 
-            self.update_progressbar ( 31 ) ############## update progressbar
+            self.update_progressbar ( 22 ) ############## update progressbar
 
             # # check same file name exists or not
             # file_exists= self.subproccess_check_file_exists ( new_file_name, progress_callback )
@@ -869,9 +953,9 @@ class MainWindow( QMainWindow ):
             # call upload module get the path
             command = M_upload.get_bypy_upload_command ()
 
-            self.update_progressbar ( 40 ) ############## update progressbar
+            self.update_progressbar ( 25 ) ############## update progressbar
 
-            barv = 40
+            barv = 25
             barIndex = 0
 
             # use subproccess to uplaod
@@ -983,9 +1067,12 @@ class MainWindow( QMainWindow ):
     def thread_complete(self):
         print("Thread for uplaod done")
 
+        self.ui.plainText_show ( "Upload Completed 上传完成" )
+
         self.update_progressbar ( 100 ) ############## update progressbar
 
         self.disable_ge2 ()
+
 
 
     # END--------------------------------------------------------------------------/>
@@ -1407,7 +1494,7 @@ class MainWindow( QMainWindow ):
 
                 progress_callback.emit(value)
         except :
-            print(traceback.format_exc())
+            traceback.print_exc()
 
 
 
@@ -1480,21 +1567,232 @@ class MainWindow( QMainWindow ):
  #NOTE END-Main Window---------------------------------Main Window------------------------------------------>      
 """
 
-### start the app
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
+#SECTION - password
+class Password ( QMainWindow ):
 
-    ## loading style file <<Although it can be done via QFile >>
-    with open('style.qss', 'r') as style_file:
-        style_str = style_file.read()
-    app.setStyleSheet(style_str)
+    def __init__(self):
+        super().__init__( )
 
-    window = MainWindow()
-    window.show()
-    window.setWindowIcon(QIcon('icon/Logo.png'))
-    app.setWindowIcon(QIcon('icon/Logo.png'))
 
+    def get_password (self):
+        dlgi = QInputDialog()
+        text, ok = dlgi.getText(self, '密码(password)', ' ')
+        dlgi.closeEvent = self.CloseEvent
+        self.show()
+
+        if ok:
+            print( "User given text", text )
+            self.hide()
+            return text
+        else :
+            self.hide()
+            return None
+
+    def CloseEvent(self, event):
+        print("clossed ")
+        return None
+        
+    def set_password (self):
+        dlgi = QInputDialog()
+        text, ok = dlgi.getText(self, '輸入新密碼(input password)', ' ')
+        self.show()
+        if ok:
+            # print( "User Given Text", text )
+            self.hide()
+            return text
+        else :
+            self.hide()
+            return None
+        
+
+class CheckPassWord() :
+    def __init__(self) :
+        self.base_path = M_upload.get_directory_path ()
+        self.pwsd_dir = "pwd"
+
+
+    def create_pwd_folder ( self ):
+        try:
+            print ( "base directory ", self.base_path )
+            self.pwsd_dir = os.path.join ( self.base_path , self.pwsd_dir )
+            print ( "psw directory ", self.pwsd_dir )
+            os.mkdir (self.pwsd_dir)    
+        except:
+            traceback.print_exc()
     
 
-    sys.exit(app.exec())
+    def remove_pwd_folder ( self ):
+        try:
+            self.base_path = M_upload.get_directory_path ()
+            self.pwsd_dir = "pwd"
+            self.pwsd_dir = os.path.join ( self.base_path , self.pwsd_dir )
+            shutil.rmtree ( self.pwsd_dir )
+        except:
+            traceback.print_exc()
+
+    def pass_exist_in_baidu ( self ):
+        try:
+            text_Found = False
+            file_name_exists = False
+
+            remote_path = "/pwd/"
+            file_name = "t.json"
+            print (" checking pass word exist  ", file_name, "\t remote path ", remote_path )
+            command = [ "bypy", "search", file_name, remote_path ]
+            proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
+
+                # print ( "test:", line.rstrip() )
+                value = str ( line, "utf-8") .strip()
+                print("subprocces ", value)
+
+                if "Found" in value :
+                    text_Found = True
+                if text_Found and file_name in value:
+                    file_name_exists = True
+            self.flus_stdio ()
+            if file_name_exists:
+                return True
+        except:
+            print(traceback.format_exc())
+            return  None
+  
+
+    def download_ps_to_pwd ( self ):
+        try:
+            self.remove_pwd_folder ()
+            time.sleep (2)
+            self.create_pwd_folder ()
+            time.sleep ( 1 )
+            command = [ "bypy","download","/pwd/", self.pwsd_dir ]
+            subprocess.call(  command , creationflags=subprocess.CREATE_NEW_CONSOLE)
+            self.flus_stdio()
+
+        except:
+            traceback.print_exc()
+
+
+    def uplaod_ps_to_baidu ( self ):
+        try:
+            print ( "uploading from ", self.pwsd_dir )
+            command = [ "bypy", "upload", self.pwsd_dir, "/pwd/" ]
+            # subprocess.call(  command , creationflags=subprocess.CREATE_NEW_CONSOLE)
+            
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
+
+                # print ( "test:", line.rstrip() )
+                value = str(line, "utf-8")
+                print("subprocces ", value)
+        
+            
+        except:
+            traceback.print_exc ( )
+
+    
+    def create_pass_at_pwd ( self , value ):
+        self.remove_pwd_folder ()
+        time.sleep (2)
+        self.create_pwd_folder ()
+        time.sleep (2)
+
+        json_value = { "password": value }
+        json_object = json.dumps( json_value )
+
+        # Writing to sample.json
+        path = os.path.join ( self.pwsd_dir , "t.json" )
+        with open(  path, "w") as outfile:
+            outfile.write(json_object)
+        time.sleep(2)
+
+
+    def read_pass_from_pwd ( self ):
+
+        path = os.path.join ( self.pwsd_dir , "t.json" )
+
+        f = open( path )
+        # returns JSON object as
+        # a dictionary
+        data = json.load(f)
+        password = data["password"]
+
+        return password
+
+
+    def flus_stdio ( self ):
+        try:
+            sys.stdout.flush()
+        except:
+            traceback.print_exc()
+#!SECTION - password
+
+
+### start the app
+if __name__ == "__main__":
+    try:
+
+        # #  first check password exists in baidu or not
+        check_pass = CheckPassWord ()
+        pass_exists = check_pass.pass_exist_in_baidu()
+
+        if pass_exists :
+            check_pass.download_ps_to_pwd()
+            pass
+        else:
+            check_pass.create_pass_at_pwd ("123456")
+            check_pass.uplaod_ps_to_baidu()
+
+        _PASSWORD = check_pass.read_pass_from_pwd()
+        
+        # for QT ui initiate system
+        app = QApplication(sys.argv)
+
+        # ui for password , 
+        # by default it will ask user for password
+        pass_w = Password()
+        pass_w.setWindowIcon(QIcon('icon/Logo.png'))
+        # pass_w.hide()
+
+        user_given_pass = pass_w.get_password()
+
+
+        # NOTE match pass word
+        for i in range(1,3):
+            if user_given_pass == _PASSWORD:
+                break
+            else:
+                user_given_pass = pass_w.get_password ()
+        
+        if not user_given_pass == _PASSWORD:
+            _PM.color_print ("password does not match ", _PM.Color.RED)
+
+        else:
+            # loading style file <<Although it can be done via QFile >>
+            with open('style.qss', 'r') as style_file:
+                style_str = style_file.read()
+            app.setStyleSheet(style_str)
+
+            window = MainWindow()
+            window
+            window.show()
+            window.setWindowIcon(QIcon('icon/Logo.png'))
+            app.setWindowIcon(QIcon('icon/Logo.png'))
+            app.exec()
+            # sys.exit()
+    except:
+        print("has problem")
+        traceback.print_exc()
+
+    # time.sleep(100)
+    # sys.exit()
+    print("closing the application")
+    time.sleep(3)
+
 

@@ -4,12 +4,12 @@ import time
 import shutil
 import _thread
 from zipfile import ZipFile
-from bypy import ByPy
-from pyunpack import Archive
+
 import traceback
 
 
-bp = ByPy()
+
+
 
 path_list = []
 
@@ -65,10 +65,10 @@ def start_unzipping( path ):
     try:
         # prepare the uploaded file location 
         value = r"" + path
-        # with ZipFile ( value, "r" ) as zObj:
-        #     zObj.extractall ( path= './module/temp'  )
+        with ZipFile ( value, "r" ) as zObj:
+            zObj.extractall ( path= './module/temp'  )
         
-        Archive( path ).extractall( './module/temp' )
+        # Archive( path ).extractall( './module/temp' )
     except:
         unzipped = False
         status = "Could not unzipped"
@@ -157,17 +157,6 @@ def rename_file_in_temp ( selected_file_name, rename_to ):
     json_value = { "rename_file_in_temp" : file_renamed, "status" : status }   
     return json_value
 
-
-#FIXME -  - we will use subproccess to do this, we willnot be using this one
-## From temp folder uplaod directory to the Baidu YUn
-def upload_to_baidu( remotePath  = ""):
-    rootDir = get_directory_path()
-    # folder_name = os.listdir ( rootDir )[0]
-    # path = r""+ os.path.join( rootDir, folder_name )
-    ONDUP = "ONDUP/" + remotePath
-    bp.upload( rootDir, ONDUP)
-
-    print(bp.list())   
 
 
 # this is shell command in list
