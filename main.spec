@@ -7,7 +7,7 @@ added_files=[
     ("icon","icon"),
     ("style.qss","."),
     ("DB","DB"),
-    ("module/temp","module/temp")
+    ("module","module")
 ]
 
 

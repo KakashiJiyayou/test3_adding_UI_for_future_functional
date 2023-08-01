@@ -524,7 +524,7 @@ class MainWindow( QMainWindow ):
         
 
     def download_proccess (self, bypy_path, local_path, progress_callback):
-        bypy_path = "ONDUP" + bypy_path
+        bypy_path = "ONDUP/" + bypy_path
         command = [ "bypy", "download", bypy_path, local_path  ]
         self.suproccess_show_plaintext ( command, progress_callback)
 
