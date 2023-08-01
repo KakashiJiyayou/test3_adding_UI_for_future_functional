@@ -700,7 +700,7 @@ class MainWindow( QMainWindow ):
 
             if file_uploaded :
                 new_file_path_bypy +=  new_file_name
-                list1 = [ new_file_path_bypy ]
+                list1 =  new_file_path_bypy 
                 insert_db = Database.insert_dir_list( list1, menu )
                 print (" file uplaoded done , insert_db ", insert_db)
                 progress_callback.emit ( "(file upload done )文件上传完成" + str (new_file_path_bypy) )
