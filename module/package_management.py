@@ -48,16 +48,16 @@ def package_installed ( package_name ):
     
 
 
-# def isntall_library ( package_name ):
-#     try :
-#         # pip._internal
-#         # pip.main(['install', package_name])
-#         string = "pip install " + str ( package_name)
-#         os.system(string)
-#         # subprocess.call([ 'pip', 'install', package_name], creationflags=subprocess.CREATE_NEW_CONSOLE)
-#         # subprocess.([sys.executable, "-m",  "pip", "install", package_name])
-#     except:
-#         traceback.print_exc() 
+def isntall_library ( package_name ):
+    try :
+        # pip._internal
+        # pip.main(['install', package_name])
+        string = "pip install " + str ( package_name)
+        os.system(string)
+        # subprocess.call([ 'pip', 'install', package_name], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        # subprocess.([sys.executable, "-m",  "pip", "install", package_name])
+    except:
+        traceback.print_exc() 
 
 
 def packages_check_installed ():
@@ -68,6 +68,7 @@ def packages_check_installed ():
             item["installed"] = True
         else:
             print (" installing library pls wait, it can take 10 mins ")
+            isntall_library ( item["name"] ) 
        
 
 def close_application_if_package_not_installed():

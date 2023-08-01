@@ -1,11 +1,14 @@
 import os
 import glob
 import time
+import ntpath
 import shutil
 import _thread
 from zipfile import ZipFile
 
 import traceback
+
+
 
 
 
@@ -105,11 +108,10 @@ def folder_list( rootDir = None ):
             print ( "From upload module path ", p)
             # put in the list if it's only file
             if os.path.isfile (p):
-                path_list.append( p.replace( delete_rootDir , "" ) )
+                p = ntpath.basename ( p )
+                path_list.append( p )
 
         
-
-
 # copy file one folder to another
 def copy_file_to_temp ( file_path_on_pc, symlinks=False, ignore=None ):
 
@@ -179,7 +181,12 @@ def get_directory_path():
     path =  os.path.join ( cwd , "temp")
     return path
 
-
+try:
+    print ( "crating directory" )
+    path = get_directory_path ()
+    os.mkdir ( path )
+except:
+    traceback.print_exc()
 
 
 """ ==========================START=============================== """

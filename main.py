@@ -89,8 +89,8 @@ class MainWindow( QMainWindow ):
         self.ui.page_stackedWidget.setCurrentIndex(1)
         search_text = self.ui.search_input.text().strip()
 
-        if search_text:
-            self.ui.search_label_9.setText( search_text)
+        # if search_text:
+        #     self.ui.search_label_9.setText( search_text)
             # print("Search bar text ", search_text)
 
 
@@ -145,7 +145,7 @@ class MainWindow( QMainWindow ):
 
     ## Group1 disable
     def disable_g1( self ):
-        self.ui.pushButton_upload.setEnabled ( False )
+        self.ui.pushButton_upload.setDisabled ( True )
 
 
     ## Group Edit 2 
@@ -161,13 +161,13 @@ class MainWindow( QMainWindow ):
 
     ## Group Edit 2 disable
     def disable_ge2( self ):
-        self.ui.pushButton_update.setEnabled ( False )
-        self.ui.pushButton_download.setEnabled ( False )
-        self.ui.pushButton_remove.setEnabled ( False )
-        self.ui.radioButton_newDoc.setEnabled ( False )
-        self.ui.radioButton_addImage.setEnabled ( False )
-        self.ui.search_btn.setEnabled ( False)
-        self.ui.search_input.setEnabled ( False )
+        self.ui.pushButton_update.setDisabled ( True )
+        self.ui.pushButton_download.setDisabled ( True )
+        self.ui.pushButton_remove.setDisabled ( True )
+        self.ui.radioButton_newDoc.setDisabled ( True )
+        self.ui.radioButton_addImage.setDisabled ( True )
+        self.ui.search_btn.setDisabled ( True )
+        self.ui.search_input.setDisabled ( True )
 
     
     ## Group side bar
@@ -186,15 +186,15 @@ class MainWindow( QMainWindow ):
 
     ## Group side bar disable
     def diasble_side_bar ( self ):
-        self.ui.home_btn_1.setEnabled ( False )
-        self.ui.home_btn_2.setEnabled ( False )
-        self.ui.dashboard_btn_1.setEnabled ( False )
-        self.ui.dashboard_btn_2.setEnabled ( False )
-        self.ui.change_btn.setEnabled ( False )
-        self.ui.pushButton_2_change_password.setEnabled ( False )
-        self.ui.pushButton_3_change_password.setEnabled ( False )
-        self.ui.pushButton_Change_lang.setEnabled ( False )
-        self.ui.pushButton_2_change_language.setEnabled ( False )
+        self.ui.home_btn_1.setDisabled ( True )
+        self.ui.home_btn_2.setDisabled ( True )
+        self.ui.dashboard_btn_1.setDisabled ( True )
+        self.ui.dashboard_btn_2.setDisabled ( True )
+        self.ui.change_btn.setDisabled ( True )
+        self.ui.pushButton_2_change_password.setDisabled ( True )
+        self.ui.pushButton_3_change_password.setDisabled ( True )
+        self.ui.pushButton_Change_lang.setDisabled ( True )
+        self.ui.pushButton_2_change_language.setDisabled ( True )
 
     ## hide some elements
     def hide_some_ui ( self ):
@@ -269,6 +269,7 @@ class MainWindow( QMainWindow ):
             self.diasble_side_bar ()
             self.disable_g1 ()
             self.disable_ge2 ()
+            self.update_progressbar (50)
 
             try:
                 worker = WorkQT.Worker( self.change_password_procces, new_given_password )
@@ -283,7 +284,6 @@ class MainWindow( QMainWindow ):
 
         try:
             password_check = CheckPassWord ()
-            self.update_progressbar (50)
             new_given_password = new_given_password.strip ()
             password_check.create_pass_at_pwd ( new_given_password )
             path = os.path.join ( os.path.dirname( os.path.abspath( __file__ ) ) , "pwd" )
@@ -294,10 +294,6 @@ class MainWindow( QMainWindow ):
             command = [ "bypy", "upload", path , "/pwd/" ]
             self.suproccess_show_plaintext  ( command, progress_callback )
         except:
-            self.update_progressbar ( 100 )
-            self.enable_side_bar ()
-            self.enable_show_g1 ()
-            self.enable_show_ge2 ()
             traceback.print_exc ()
 
     
@@ -405,9 +401,6 @@ class MainWindow( QMainWindow ):
             
             button1 = dlg1.exec ()
 
-            # update progressbar
-            self.update_progressbar ( 30 )
-
             if button1 == QMessageBox.Yes :
                 print ( "Removing Contents" )
 
@@ -439,7 +432,7 @@ class MainWindow( QMainWindow ):
     def remove_proccess(self, path , progress_callback):
 
         # update progressbar
-        self.update_progressbar ( 40 )
+       
 
         # lets get path and the file name
         head, tail = os.path.split ( path )
@@ -450,7 +443,7 @@ class MainWindow( QMainWindow ):
 
         file_exists = self.subproccess_check_file_exists2 ( tail, head, progress_callback  )
 
-        self.update_progressbar ( 80 ) ############## update progressbar
+      
 
         if file_exists :
             print ( " failled to remove " )
@@ -459,7 +452,7 @@ class MainWindow( QMainWindow ):
             print ( Database.delete_path_list ( path ) )
 
             pass
-        self.update_progressbar ( 90 ) ############## update progressbar
+      
 
 
 
@@ -531,10 +524,8 @@ class MainWindow( QMainWindow ):
         
 
     def download_proccess (self, bypy_path, local_path, progress_callback):
-        self.update_progressbar ( 33 ) ############## update progressbar
         bypy_path = "ONDUP" + bypy_path
         command = [ "bypy", "download", bypy_path, local_path  ]
-        self.update_progressbar ( 41 ) ############## update progressbar
         self.suproccess_show_plaintext ( command, progress_callback)
 
 
@@ -630,7 +621,14 @@ class MainWindow( QMainWindow ):
                     worker.signals.progress.connect ( self.update_show_progress )
                     worker.signals.finished.connect ( self.update_complete )
                     
+
+                    # Disable:: sidebar, Group 1-2
+                    self.disable_g1 ()
+                    self.disable_ge2 ()
+                    self.diasble_side_bar () 
+
                     self.threadpool.start ( worker )
+
                 else:
                     self.update_progressbar ( 100 ) ############## update progressbar
                     self.show_popup_text ( "Extension Error","Chosen file are not same type 選擇的文件類型不同" )
@@ -650,12 +648,7 @@ class MainWindow( QMainWindow ):
     def update_ongoing_proccess (self, 
                                  new_file_location_pc , new_file_path_bypy, new_file_name, menu, progress_callback ) :
         
-        # Disable:: sidebar, Group 1-2
-        self.disable_g1 ()
-        self.disable_ge2 ()
-        self.diasble_side_bar () 
-
-        self.update_progressbar ( 33 ) ############## update progressbar
+        
 
         if not len (  new_file_location_pc ) < 3:
             
@@ -666,8 +659,6 @@ class MainWindow( QMainWindow ):
             print ( "Clear temp dir ", M_upload.clear_temp_dir())
             moduel_path  = M_upload.get_directory_path ()
             shutil.copy ( new_file_location_pc , moduel_path )
-
-            self.update_progressbar ( 36 ) ############## update progressbar
 
 
             # get selected file name
@@ -694,22 +685,18 @@ class MainWindow( QMainWindow ):
             # rename document 
             M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
 
-            self.update_progressbar ( 45 ) ############## update progressbar
 
             # get upload cmmand
             command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
 
-            self.update_progressbar ( 55 ) ############## update progressbar
 
             # NOTE - Update Document using subprocces
             self.suproccess_show_plaintext ( command, progress_callback )
 
-            self.update_progressbar ( 80 ) ############## update progressbar
 
             # check file upload succcesfull 
             file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
 
-            self.update_progressbar ( 90 ) ############## update progressbar
 
             if file_uploaded :
                 new_file_path_bypy +=  new_file_name
@@ -722,12 +709,10 @@ class MainWindow( QMainWindow ):
                 print ("failed to uplaod file")
                 progress_callback.emit ( "(failled to upload file)文件上传失败" )
 
-            self.update_progressbar ( 97 ) ############## update progressbar
 
             # clear temp dir
             print ( M_upload.clear_temp_dir () )
 
-            self.update_progressbar ( 98 ) ############## update progressbar
 
 
 
@@ -866,6 +851,9 @@ class MainWindow( QMainWindow ):
             worker.signals.result.connect(self.show_result)
             worker.signals.finished.connect(self.thread_complete)
 
+            time.sleep(2)
+            
+            self.update_progressbar ( 20 ) ############## update progressbar
             self.threadpool.start(worker)
 
             # test method for uplaod
@@ -905,9 +893,6 @@ class MainWindow( QMainWindow ):
                     shutil.copy( path, modue_path )
                     print ( "unzip inser folder chosen")
 
-            self.update_progressbar ( 19 ) ############## update progressbar
-
-
             progress_callback.emit( "uploading to baidu" )
 
             folder_list = M_upload.get_folder_list ()
@@ -938,13 +923,10 @@ class MainWindow( QMainWindow ):
                     print (" unzip_upload_insert file name does not exists ",temp_file_name  )
 
 
-            self.update_progressbar ( 20 ) ############## update progressbar
 
             folder_list = M_upload.get_folder_list ()
             print (" unzip_upload_insert ", folder_list)
 
-
-            self.update_progressbar ( 22 ) ############## update progressbar
 
             # # check same file name exists or not
             # file_exists= self.subproccess_check_file_exists ( new_file_name, progress_callback )
@@ -952,7 +934,6 @@ class MainWindow( QMainWindow ):
             # call upload module get the path
             command = M_upload.get_bypy_upload_command ()
 
-            self.update_progressbar ( 25 ) ############## update progressbar
 
             barv = 25
             barIndex = 0
@@ -972,12 +953,6 @@ class MainWindow( QMainWindow ):
                     # insterting data
                     insert_result = Database.insert_dir_list ( item, menu )
                     print ( "DB insert result" , insert_result )
-
-                if barIndex == 10 :
-                    barv = barv + 1
-                    self.update_progressbar ( barv ) ############## update progressbar
-                    barIndex = 0
-                barIndex = barIndex + 1
             
         
         # clearing temp directory
@@ -1000,7 +975,6 @@ class MainWindow( QMainWindow ):
         # show thar process starte
         progress_callback.emit("Process started")
 
-        self.update_progressbar ( 1 ) ############## update progressbar
 
         # first check all the comboxes selected or not
         all_comboboxes_selected = False
@@ -1027,10 +1001,8 @@ class MainWindow( QMainWindow ):
         if not all_comboboxes_selected :
             progress_callback.emit("menu not selected")
 
-            self.update_progressbar ( 100 ) ############## update progressbar
 
         else :
-            self.update_progressbar ( 19 ) ############## update progressbar
 
             self.unzip_upload_insert ( file_path, all_text, progress_callback )
             # progress_callback.emit("menu  selected")
@@ -1478,7 +1450,7 @@ class MainWindow( QMainWindow ):
 
         elif percentage_done >0 and percentage_done < 100:
             self.ui.progressBar.setVisible ( True )
-            
+            time.sleep (2)
             self.disable_g1 ()
             self.disable_ge2()
             self.diasble_side_bar()
