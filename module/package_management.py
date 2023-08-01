@@ -1,10 +1,13 @@
 import os
+import pip
 import sys
 import time
+
 import pkgutil
+import importlib.util
 import traceback
 import subprocess
-from subprocess import CREATE_NEW_CONSOLE, run
+# from subprocess import CREATE_NEW_CONSOLE, run
 from enum import Enum
 
 class Color(Enum):
@@ -35,19 +38,26 @@ list_package = [
 
 def package_installed ( package_name ):
     try:
+        
         eggs_loader = pkgutil.find_loader(package_name)
         found = eggs_loader is not None
+        # found = importlib.util.find_spec(package_name)
         return found
     except:
         return False
     
 
 
-def isntall_library ( package_name ):
-    try :
-        subprocess.check_call([sys.executable, "-m",  "pip", "install", package_name])
-    except:
-        traceback.print_exc() 
+# def isntall_library ( package_name ):
+#     try :
+#         # pip._internal
+#         # pip.main(['install', package_name])
+#         string = "pip install " + str ( package_name)
+#         os.system(string)
+#         # subprocess.call([ 'pip', 'install', package_name], creationflags=subprocess.CREATE_NEW_CONSOLE)
+#         # subprocess.([sys.executable, "-m",  "pip", "install", package_name])
+#     except:
+#         traceback.print_exc() 
 
 
 def packages_check_installed ():
@@ -57,7 +67,8 @@ def packages_check_installed ():
         if is_installed:
             item["installed"] = True
         else:
-            isntall_library ( item["name"] )
+            print (" installing library pls wait, it can take 10 mins ")
+       
 
 def close_application_if_package_not_installed():
     packages_not_installed = False
@@ -89,6 +100,7 @@ def check_bypy_information (  ):
         
 
 packages_check_installed ()
+time.sleep(4)
 close_application_if_package_not_installed()
 check_bypy_information ()
 

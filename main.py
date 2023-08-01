@@ -1,7 +1,7 @@
 import os
 import  sys
 
-from module import package_management as _PM
+# from module import package_management as _PM
 
 
 import ntpath
@@ -286,14 +286,13 @@ class MainWindow( QMainWindow ):
             self.update_progressbar (50)
             new_given_password = new_given_password.strip ()
             password_check.create_pass_at_pwd ( new_given_password )
-            path = M_upload.get_directory_path()
-            path = os.path.join( path, "pwd" )
+            path = os.path.join ( os.path.dirname( os.path.abspath( __file__ ) ) , "pwd" )
             print( "change passwor dprocces path ", path)
             command = ["bypy", "delete", "/pwd/"]
             self.suproccess_show_plaintext ( command, progress_callback )
             time.sleep(2)
             command = [ "bypy", "upload", path , "/pwd/" ]
-            self.suproccess_show_plaintext ( command, progress_callback )
+            self.suproccess_show_plaintext  ( command, progress_callback )
         except:
             self.update_progressbar ( 100 )
             self.enable_side_bar ()
@@ -303,7 +302,7 @@ class MainWindow( QMainWindow ):
 
     
     def change_password_finsihed ( self ):
-        self.ui.plainText_show ( "Password Changed 密碼已更改" )
+        self.ui.plainText_show.setPlainText ( "Password Changed 密碼已更改" )
         self.update_progressbar ( 100 )
         self.enable_side_bar ()
         self.enable_show_g1 ()
@@ -751,7 +750,7 @@ class MainWindow( QMainWindow ):
         self.update_progressbar ( 100 ) ############## update progressbar
         self.disable_g1 ()
 
-        self.ui.plainText_show ("update done 更新完成")
+        self.ui.plainText_show.setPlainText ("update done 更新完成")
 
 
     ## ----------------------------------------------------------------------------/>
@@ -1067,7 +1066,7 @@ class MainWindow( QMainWindow ):
     def thread_complete(self):
         print("Thread for uplaod done")
 
-        self.ui.plainText_show ( "Upload Completed 上传完成" )
+        self.ui.plainText_show.setPlainText ( "Upload Completed 上传完成" )
 
         self.update_progressbar ( 100 ) ############## update progressbar
 
@@ -1392,7 +1391,7 @@ class MainWindow( QMainWindow ):
                 filter_menu  += "." + item.currentText ()
 
         # Try to get text from search
-        searc_txt = self.ui.search_input
+        # searc_txt = self.ui.search_input
 
         # call database to get data on this 
         result_list = Database.get_dir_list( filter_menu )
@@ -1401,16 +1400,35 @@ class MainWindow( QMainWindow ):
         # put the list in self._search_path_list
         self._search_path_list = result_list
 
-        # print ("Now update the completer")
+        
+
+    def search_finsihed ( self, s):
         self.update_search_path()
 
-
-
     def on_search_input_textChanged ( self ):
+        print ("search input text ", self.ui.search_input.text())
 
-        worker = WorkQT.Worker ( self.get_search_path_list_from_db )
+        # worker = WorkQT.Worker ( self.get_search_path_list_from_db )
+        # worker.signals.finished.connect ( self.search_finsihed )
+        # self.threadpool.start ( worker )
 
-        self.threadpool.start ( worker )
+        # can delete later
+        filter_menu = ""
+        for item in self.combo_box_list:
+            if item.currentText () is not None:
+                filter_menu  += "." + item.currentText ()
+
+        # Try to get text from search
+        # searc_txt = self.ui.search_input
+
+        # call database to get data on this 
+        result_list = Database.get_dir_list( filter_menu )
+        # print ( result_list )
+
+        # put the list in self._search_path_list
+        print ( "search result ", result_list )
+        self._search_path_list = result_list
+        self.update_search_path()
 
     
 
@@ -1614,7 +1632,8 @@ class CheckPassWord() :
     def create_pwd_folder ( self ):
         try:
             print ( "base directory ", self.base_path )
-            self.pwsd_dir = os.path.join ( self.base_path , self.pwsd_dir )
+
+            self.pwsd_dir = os.path.join ( os.path.dirname( os.path.abspath( __file__ ) ) , self.pwsd_dir )
             print ( "psw directory ", self.pwsd_dir )
             os.mkdir (self.pwsd_dir)    
         except:
@@ -1623,9 +1642,8 @@ class CheckPassWord() :
 
     def remove_pwd_folder ( self ):
         try:
-            self.base_path = M_upload.get_directory_path ()
             self.pwsd_dir = "pwd"
-            self.pwsd_dir = os.path.join ( self.base_path , self.pwsd_dir )
+            self.pwsd_dir = os.path.join ( os.path.dirname( os.path.abspath( __file__ ) ) , self.pwsd_dir )
             shutil.rmtree ( self.pwsd_dir )
         except:
             traceback.print_exc()
@@ -1771,7 +1789,8 @@ if __name__ == "__main__":
                 user_given_pass = pass_w.get_password ()
         
         if not user_given_pass == _PASSWORD:
-            _PM.color_print ("password does not match ", _PM.Color.RED)
+            print ("password does not match ")
+            pass
 
         else:
             # loading style file <<Although it can be done via QFile >>

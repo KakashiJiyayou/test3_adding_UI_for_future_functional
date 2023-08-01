@@ -12,7 +12,7 @@ added_files=[
 
 
 a = Analysis(
-    ['main.py', "resource_rc.py", "resource_ui.py", "module/Create_Menu_From_MD.py", "module/upload.py", "module/worker_pyqt.py","module/database.py"],
+    ['main.py', "resource_rc.py", "resource_ui.py", "module/Create_Menu_From_MD.py", "module/upload.py", "module/worker_pyqt.py","module/database.py", "module/package_management.py"],
     pathex=[],
     binaries=[],
     datas=added_files,
