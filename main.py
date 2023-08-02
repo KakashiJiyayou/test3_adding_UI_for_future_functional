@@ -89,9 +89,16 @@ class MainWindow( QMainWindow ):
         self.ui.page_stackedWidget.setCurrentIndex(1)
         search_text = self.ui.search_input.text().strip()
 
-        # if search_text:
-        #     self.ui.search_label_9.setText( search_text)
-            # print("Search bar text ", search_text)
+        self.get_search_path_list_from_db ( None )
+
+        string_value = ""
+
+        for item in self._search_path_list:
+            string_value = string_value + str ( item ) + "\n"
+
+        self.ui.plainText_show.setPlainText ( string_value  ) 
+
+
 
 
     ## Function For Changing Page TO 
@@ -915,7 +922,7 @@ class MainWindow( QMainWindow ):
 
                 progress_callback.emit ( "checking content exists or not 檢查內容是否存在 \t" +str ( new_file_name ) )
 
-                if self.subproccess_check_file_exists ( "/bypy/ONDUP/" + new_file_name, progress_callback ) :
+                if self.subproccess_check_file_exists (  temp_file_name, progress_callback ) or self.subproccess_check_file_exists (  new_file_name, progress_callback )  :
                     print (" unzip_upload_insert file name exists " , temp_file_name )
                     # rename document
                     M_upload.rename_file_in_temp ( temp_file_name, new_file_name )
@@ -1345,6 +1352,8 @@ class MainWindow( QMainWindow ):
     # Update search path list
     # This method will take value for "self._search_path_list"
     # It will just add them to the completer
+
+
     def update_search_path( self ):
         model = self.searh_completer.model ()
         model.setStringList( self._search_path_list)
