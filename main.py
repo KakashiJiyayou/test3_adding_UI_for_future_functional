@@ -1488,11 +1488,15 @@ class MainWindow( QMainWindow ):
                 if not line:
                     break
 
-                # print ( "test:", line.rstrip() )
-                value = str(line, "utf-8")
-                print("subprocces ", value)
-
-                progress_callback.emit(value)
+                               # print ( "test:", line.rstrip() )
+                try:
+                    value = str ( line, "utf-8") .strip()
+                    print("subprocces ", value)
+                    progress_callback.emit ( value )
+                except:
+                    progress_callback.emit ( line )
+                    traceback.print_exc ()
+                
         except :
             traceback.print_exc()
 
@@ -1562,17 +1566,29 @@ class MainWindow( QMainWindow ):
                     break
 
                 # print ( "test:", line.rstrip() )
-                value = str ( line, "utf-8") .strip()
-                print("subprocces ", value)
-                progress_callback.emit ( value )
+                try:
+                    value = str ( line, "utf-8") .strip()
+                    print("subprocces ", value)
+                    
 
-                if "Found" in value :
-                    text_Found = True
-                if text_Found and file_name in value:
-                    file_name_exists = True
-
-            if file_name_exists:
-                return True
+                    progress_callback.emit ( value )
+                    if "Found" in value :
+                        text_Found = True
+                    if text_Found and file_name in value:
+                        file_name_exists = True
+                except:
+                    value = bytes (line)
+                    line = str ( line )
+                    print ( line )
+                    #value = ( line ).encode('utf-8').decode('unicode_escape')
+                    print ( "*"*10)
+                    print ( value )
+                    print ( "*"*10)
+                    if text_Found :
+                        file_name_exists = True
+                    
+                    progress_callback.emit ( line )
+                    traceback.print_exc ()
         except:
             print(traceback.format_exc())
             return  None
