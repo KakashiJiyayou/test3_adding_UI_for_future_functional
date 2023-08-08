@@ -1,0 +1,2 @@
+pyrcc5.exe .\resource.qrc -o .\resource_rc.py
+pyuic5.exe .\base_ui.ui -o .\resource_ui.py   
