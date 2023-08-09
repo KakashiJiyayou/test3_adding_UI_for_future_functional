@@ -142,7 +142,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="pushButton_2_genetate">
            <property name="text">
             <string/>
            </property>
@@ -353,7 +353,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_3">
+          <widget class="QPushButton" name="pushButton_3_generate">
            <property name="text">
             <string>Generate</string>
            </property>
@@ -611,7 +611,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
-              <widget class="QScrollArea" name="scrollArea">
+              <widget class="QScrollArea" name="scrollArea_generate_page">
                <property name="widgetResizable">
                 <bool>true</bool>
                </property>
@@ -662,7 +662,7 @@
                   <property name="geometry">
                    <rect>
                     <x>0</x>
-                    <y>-31</y>
+                    <y>0</y>
                     <width>260</width>
                     <height>309</height>
                    </rect>
@@ -933,14 +933,14 @@
               </spacer>
              </item>
              <item row="0" column="2">
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="pushButton_generate_doc">
                <property name="font">
                 <font>
                  <pointsize>14</pointsize>
                 </font>
                </property>
                <property name="text">
-                <string>Upload</string>
+                <string>Generate</string>
                </property>
               </widget>
              </item>
@@ -1459,9 +1459,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>pushButton_2_genetate</sender>
    <signal>clicked(bool)</signal>
-   <receiver>pushButton_3</receiver>
+   <receiver>pushButton_3_generate</receiver>
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1475,9 +1475,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_3</sender>
+   <sender>pushButton_3_generate</sender>
    <signal>clicked(bool)</signal>
-   <receiver>pushButton_2</receiver>
+   <receiver>pushButton_2_genetate</receiver>
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">

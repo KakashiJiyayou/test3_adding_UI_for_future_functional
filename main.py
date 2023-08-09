@@ -44,50 +44,41 @@ class MainWindow( QMainWindow ):
     ## Initial Function
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.threadpool = QThreadPool()
+        self._IS_CREATING_MENU = False
         self.ui     =   Ui_MainWindow()
+
         self.ui.setupUi(self)
+        # getting ui elements
+        self.scroll_content_0 = self.ui.scrollArea_2_edit_page
+        self.scroll_content_generate = self.ui.scrollArea_generate_page
+
         self.ui.icon_only_widget.hide()
-        self.ui.page_stackedWidget.setCurrentIndex(0)
         self.ui.home_btn_2.setChecked(1)
 
         # initialize variables
         # Variables with "_" prefix will be shared between pages
-        self._selected_menu_json_path = None
-        self._initial_menu_list = None
         self._current_page_index = 0
-        self._Menu_Json = None
-        self._first_key = ""
+        
         self._folder_chosen = True
         self._is_english = True
 
         self.Upload_Button_Clicked = False
         self.Update_Button_Clicked = False
 
-    
-
         self._search_path_list = []
 
-        self.threadpool = QThreadPool()
+       
 
         # initialize some module value
         self.M_Uplaod = M_upload
 
-        #
-        self.threadpool = QThreadPool()
-
-        # getting ui elements
-        self.scroll_content_0 = self.ui.scrollArea_2_edit_page
-        self.vbox_menu = QVBoxLayout()
-        self.combo_box_list : QComboBox() = [] 
-
-        
 
         self.setting_up_app()
 
 
     ## Function For Searching
     def on_search_btn_clicked(self):
-        self.ui.page_stackedWidget.setCurrentIndex(1)
         search_text = self.ui.search_input.text().strip()
 
         self.get_search_path_list_from_db ( None )
@@ -105,7 +96,7 @@ class MainWindow( QMainWindow ):
     ## Function For Changing Page TO 
     ## User Page <<curently we do not need it>>
     def on_user_btn_clicked(self):
-        self.ui.page_stackedWidget.setCurrentIndex(6)
+        print ( "do nothing on_user_btn_clicked" )
 
 
     ## Change QPushButton Checkable 
@@ -137,14 +128,11 @@ class MainWindow( QMainWindow ):
         self.searh_completer.setCaseSensitivity(0)
         self.ui.search_input.setCompleter ( self.searh_completer )
 
-        # initial methods
-        # initial page menu setting
-        self.make_drop_down_menu()
-
         # make_goup_one visible and enable
         self.update_progressbar (0)
         self.update_page_status ()
         self.hide_some_ui ()
+
     
     ## Group1 
     def enable_show_g1 ( self ):
@@ -223,6 +211,10 @@ class MainWindow( QMainWindow ):
     def on_home_btn_1_toggled(self):        ## for uplaodpage
         self._current_page_index = 0
         self.update_page_status ()
+        # page menu setting
+        if not self._IS_CREATING_MENU :
+            self._IS_CREATING_MENU = True
+            self.make_drop_down_menu()
     
 
     def on_home_btn_2_toggled(self):        ## for uplaodpage
@@ -233,12 +225,53 @@ class MainWindow( QMainWindow ):
     def on_dashboard_btn_1_toggled(self):   ## for  download page
         self._current_page_index = 1
         self.update_page_status ()
+        # page menu setting
+        if not self._IS_CREATING_MENU :
+            self._IS_CREATING_MENU = True
+            self.make_drop_down_menu()
     
 
     def on_dashboard_btn_2_toggled(self):   ## downlaod page
         self._current_page_index = 1
         self.update_page_status ()
+        self.ui.pushButton_3_generate
+        self.ui.pushButton_2_genetate
+
+
+    def on_pushButton_2_genetate_toggled ( self):
+       self.generate_page ()
+       # page menu setting
+       if not self._IS_CREATING_MENU :
+           self._IS_CREATING_MENU = True
+           self.make_drop_down_menu()
+       
     
+    def on_pushButton_3_genetate_toggled ( self):
+        self.generate_page ()
+        
+
+    def generate_page ( self ):
+        # STUB - in this function we set variable to one but
+        # page index to 0
+        self._current_page_index = 1
+        self.update_page_status ()
+        
+        self.ui.page_stackedWidget.setCurrentIndex (0)
+        
+        self._IS_NORMAL_PAGE = False
+        
+        # clear the checbox layout
+        layout = self.ui.scrollarea_checkbox_dirlist.layout()
+        if layout:
+            while layout.count():
+                item = layout.itemAt(0)
+                widget = item.widget()
+                if widget:
+                    layout.removeWidget(widget)
+                    widget.deleteLater()
+                else:
+                    layout.removeItem(item)
+
 
     def update_page_status( self ):
         if self._current_page_index == 0 :
@@ -249,6 +282,11 @@ class MainWindow( QMainWindow ):
             self.disable_g1 ()
             self.ui.pushButton_2_change_password
             self.ui.pushButton_3_change_password
+            
+        self.ui.page_stackedWidget.setCurrentIndex (1)
+        self._IS_NORMAL_PAGE = True
+        
+       
 
 
     ##  --------------------------------------------------------------------------/>
@@ -1068,11 +1106,20 @@ class MainWindow( QMainWindow ):
     # -------------------------------------------------------------------------------> 
     def make_drop_down_menu(self, page_index=0):
 
+        self._selected_menu_json_path = None
+        self._initial_menu_list = None
+        self._Menu_Json = None
+        self._first_key = ""
+
+        self.vbox_menu = QVBoxLayout()
+        self.combo_box_list : QComboBox() = [] 
+
         # test ::=>
         #   json_value = Read_Write_Menu.get_json_for_menu()
         #   print(" Json value from the md fiel ", json_value)
         #   Read_Write_Menu.create_menu_json_file(json_value)
-
+        
+        self.remove_All_the_elements ()
         worker = WorkQT.Worker(self.on_going_process_for_initial_menu_creation)
         worker.signals.result.connect(self.result_for_initial_menu_creation)
         self.threadpool.start(worker)
@@ -1082,8 +1129,36 @@ class MainWindow( QMainWindow ):
         self.combo_box_list = []
 
 
-    def on_going_process_for_initial_menu_creation(self, progress_callback):
+    def remove_All_the_elements ( self ):
+        # Assuming self.scroll_content_0 is your QScrollArea's widget
+        content_widget_0 = self.scroll_content_0.widget()
 
+        # Clear the layout of the content widget
+        content_layout_0 = content_widget_0.layout()
+        if content_layout_0:
+            while content_layout_0.count():
+                item = content_layout_0.itemAt(0)
+                widget = item.widget()
+                if widget:
+                    content_layout_0.removeWidget(widget)
+                    widget.deleteLater()
+                else:
+                    content_layout_0.removeItem(item)
+
+        # Repeat the same steps for self.scroll_content_generate
+        content_widget_generate = self.scroll_content_generate.widget()
+        content_layout_generate = content_widget_generate.layout()
+        if content_layout_generate:
+            while content_layout_generate.count():
+                item = content_layout_generate.itemAt(0)
+                widget = item.widget()
+                if widget:
+                    content_layout_generate.removeWidget(widget)
+                    widget.deleteLater()
+                else:
+                    content_layout_generate.removeItem(item)
+
+    def on_going_process_for_initial_menu_creation(self, progress_callback):
         progress_callback.emit ( " Reading Menu From 'menu.md' file " )
         self._Menu_Json = Read_Write_Menu.get_json_for_menu ()
         progress_callback.emit ( "Reading done successfuly " )
@@ -1117,7 +1192,11 @@ class MainWindow( QMainWindow ):
 
         widget = QWidget()
         widget.setLayout(self.vbox_menu)
-        self.scroll_content_0.setWidget(widget)
+
+        if self._IS_NORMAL_PAGE:
+            self.scroll_content_0.setWidget( widget )
+        else:    
+            self.scroll_content_generate.setWidget ( widget )
 
         self.combo_box_list.append(combo)
 
@@ -1125,6 +1204,8 @@ class MainWindow( QMainWindow ):
 
         self.combo_box_list[ temp_lenght -1 ].activated[int].connect( 
             partial(self.try_to_add_next_menu,   temp_lenght )) 
+        
+        self._IS_CREATING_MENU = False
         
         
     def try_to_add_next_menu(self, next_menu_index):
@@ -1772,6 +1853,9 @@ if __name__ == "__main__":
     try:
 
         # #  first check password exists in baidu or not
+        #
+        """
+        #FIXME -  later just remove the comment 
         check_pass = CheckPassWord ()
         pass_exists = check_pass.pass_exist_in_baidu()
 
@@ -1783,18 +1867,24 @@ if __name__ == "__main__":
             check_pass.uplaod_ps_to_baidu()
 
         _PASSWORD = check_pass.read_pass_from_pwd()
+        """
+        #FIXME -  remove this line
+        _PASSWORD = user_given_pass=  123456
         
+
         # for QT ui initiate system
         app = QApplication(sys.argv)
 
         # ui for password , 
         # by default it will ask user for password
+        """#FIXME - 
         pass_w = Password()
         pass_w.setWindowIcon(QIcon('icon/Logo.png'))
         # pass_w.hide()
 
         user_given_pass = pass_w.get_password()
-
+        
+        
 
         # NOTE match pass word
         for i in range(1,3):
@@ -1802,7 +1892,7 @@ if __name__ == "__main__":
                 break
             else:
                 user_given_pass = pass_w.get_password ()
-        
+        """
         if not user_given_pass == _PASSWORD:
             print ("password does not match ")
             pass

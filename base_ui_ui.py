@@ -85,16 +85,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.pushButton_3_change_password)
 
-        self.pushButton_2 = QPushButton(self.icon_only_widget)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2_genetate = QPushButton(self.icon_only_widget)
+        self.pushButton_2_genetate.setObjectName(u"pushButton_2_genetate")
         icon3 = QIcon()
         icon3.addFile(u":/icon/icon/edit-11-32.ico", QSize(), QIcon.Normal, QIcon.Off)
         icon3.addFile(u":/icon/icon/edit-11-49.ico", QSize(), QIcon.Normal, QIcon.On)
-        self.pushButton_2.setIcon(icon3)
-        self.pushButton_2.setCheckable(True)
-        self.pushButton_2.setAutoExclusive(True)
+        self.pushButton_2_genetate.setIcon(icon3)
+        self.pushButton_2_genetate.setCheckable(True)
+        self.pushButton_2_genetate.setAutoExclusive(True)
 
-        self.verticalLayout_2.addWidget(self.pushButton_2)
+        self.verticalLayout_2.addWidget(self.pushButton_2_genetate)
 
         self.pushButton_2_change_language = QPushButton(self.icon_only_widget)
         self.pushButton_2_change_language.setObjectName(u"pushButton_2_change_language")
@@ -187,13 +187,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.pushButton_2_change_password)
 
-        self.pushButton_3 = QPushButton(self.full_menu_widget)
-        self.pushButton_3.setObjectName(u"pushButton_3")
-        self.pushButton_3.setIcon(icon3)
-        self.pushButton_3.setCheckable(True)
-        self.pushButton_3.setAutoExclusive(True)
+        self.pushButton_3_generate = QPushButton(self.full_menu_widget)
+        self.pushButton_3_generate.setObjectName(u"pushButton_3_generate")
+        self.pushButton_3_generate.setIcon(icon3)
+        self.pushButton_3_generate.setCheckable(True)
+        self.pushButton_3_generate.setAutoExclusive(True)
 
-        self.verticalLayout.addWidget(self.pushButton_3)
+        self.verticalLayout.addWidget(self.pushButton_3_generate)
 
         self.pushButton_Change_lang = QPushButton(self.full_menu_widget)
         self.pushButton_Change_lang.setObjectName(u"pushButton_Change_lang")
@@ -303,15 +303,15 @@ class Ui_MainWindow(object):
         self.widget_for_scroll.setMaximumSize(QSize(16777215, 150))
         self.gridLayout = QGridLayout(self.widget_for_scroll)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.scrollArea = QScrollArea(self.widget_for_scroll)
-        self.scrollArea.setObjectName(u"scrollArea")
-        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea_generate_page = QScrollArea(self.widget_for_scroll)
+        self.scrollArea_generate_page.setObjectName(u"scrollArea_generate_page")
+        self.scrollArea_generate_page.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
         self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 615, 130))
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents_2)
+        self.scrollArea_generate_page.setWidget(self.scrollAreaWidgetContents_2)
 
-        self.gridLayout.addWidget(self.scrollArea, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.scrollArea_generate_page, 0, 0, 1, 1)
 
 
         self.gridLayout_4.addWidget(self.widget_for_scroll, 0, 0, 1, 1)
@@ -330,7 +330,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_checkbox = QWidget()
         self.scrollAreaWidgetContents_checkbox.setObjectName(u"scrollAreaWidgetContents_checkbox")
-        self.scrollAreaWidgetContents_checkbox.setGeometry(QRect(0, -31, 260, 309))
+        self.scrollAreaWidgetContents_checkbox.setGeometry(QRect(0, 0, 260, 309))
         self.gridLayout_3 = QGridLayout(self.scrollAreaWidgetContents_checkbox)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.scrollarea_checkbox_dirlist = QVBoxLayout()
@@ -503,11 +503,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addItem(self.horizontalSpacer_3, 0, 1, 1, 1)
 
-        self.pushButton = QPushButton(self.widget_upload)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setFont(font)
+        self.pushButton_generate_doc = QPushButton(self.widget_upload)
+        self.pushButton_generate_doc.setObjectName(u"pushButton_generate_doc")
+        self.pushButton_generate_doc.setFont(font)
 
-        self.gridLayout_2.addWidget(self.pushButton, 0, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.pushButton_generate_doc, 0, 2, 1, 1)
 
 
         self.gridLayout_4.addWidget(self.widget_upload, 3, 0, 1, 1)
@@ -699,8 +699,8 @@ class Ui_MainWindow(object):
         self.pushButton_Change_lang.clicked.connect(self.pushButton_2_change_language.toggle)
         self.pushButton_3_change_password.toggled.connect(self.pushButton_2_change_password.setChecked)
         self.pushButton_2_change_password.toggled.connect(self.pushButton_3_change_password.setChecked)
-        self.pushButton_2.clicked.connect(self.pushButton_3.setChecked)
-        self.pushButton_3.clicked.connect(self.pushButton_2.setChecked)
+        self.pushButton_2_genetate.clicked.connect(self.pushButton_3_generate.setChecked)
+        self.pushButton_3_generate.clicked.connect(self.pushButton_2_genetate.setChecked)
 
         self.page_stackedWidget.setCurrentIndex(1)
 
@@ -714,7 +714,7 @@ class Ui_MainWindow(object):
         self.home_btn_1.setText("")
         self.dashboard_btn_1.setText("")
         self.pushButton_3_change_password.setText("")
-        self.pushButton_2.setText("")
+        self.pushButton_2_genetate.setText("")
         self.pushButton_2_change_language.setText("")
         self.exit_btn_1.setText("")
         self.logo_label_2.setText("")
@@ -722,7 +722,7 @@ class Ui_MainWindow(object):
         self.home_btn_2.setText(QCoreApplication.translate("MainWindow", u"Upload", None))
         self.dashboard_btn_2.setText(QCoreApplication.translate("MainWindow", u"Edit Information", None))
         self.pushButton_2_change_password.setText(QCoreApplication.translate("MainWindow", u"Change Password", None))
-        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Generate", None))
+        self.pushButton_3_generate.setText(QCoreApplication.translate("MainWindow", u"Generate", None))
         self.pushButton_Change_lang.setText(QCoreApplication.translate("MainWindow", u"CN", None))
 #if QT_CONFIG(shortcut)
         self.pushButton_Change_lang.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Z", None))
@@ -752,7 +752,7 @@ class Ui_MainWindow(object):
         self.button_add_list_to_generate.setText("")
         self.button_clear_list_to_generate.setText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"Name", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Upload", None))
+        self.pushButton_generate_doc.setText(QCoreApplication.translate("MainWindow", u"Generate", None))
         self.radioButton_newDoc.setText(QCoreApplication.translate("MainWindow", u"Replace Old Doc file And Add new Doc file", None))
         self.radioButton_addImage.setText(QCoreApplication.translate("MainWindow", u"Add new images to the same old doc file", None))
         self.label_show.setText(QCoreApplication.translate("MainWindow", u"Description", None))
