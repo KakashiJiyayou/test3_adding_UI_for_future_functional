@@ -68,29 +68,125 @@ class MainWindow( QMainWindow ):
 
         self._search_path_list = []
 
-       
+       # Initialize an empty list of checkboxes
+        self._checkboxes = []
+
+        # Initialize new_item_list as an empty list
+        self.new_item_list_generate_doc = []
 
         # initialize some module value
         self.M_Uplaod = M_upload
+
+        # prevent creating multiple search reasult at the same time
+        # for genrating checkbox
+        self._IS_ADDING_CHECKBOXES = False
+
+        # for left side generating doc list
+        self.generate_doc_list =  []
 
 
         self.setting_up_app()
 
 
+    # NOTE - search abutton actions
     ## Function For Searching
-    def on_search_btn_clicked(self):
-        search_text = self.ui.search_input.text().strip()
-
+    def on_search_btn_pressed(self):
         self.get_search_path_list_from_db ( None )
 
-        string_value = ""
+        if self._IS_NORMAL_PAGE:
 
-        for item in self._search_path_list:
-            string_value = string_value + str ( item ) + "\n"
+            string_value = ""
 
-        self.ui.plainText_show.setPlainText ( string_value  ) 
+            for item in self._search_path_list:
+                string_value = string_value + str ( item ) + "\n"
+
+            self.ui.plainText_show.setPlainText ( string_value  ) 
+            # print ("normal page search button clicked")
+
+        # show check box in 
+        else :
+            
+            # put value in 
+            self.new_item_list_generate_doc = self._search_path_list
+            
+            # print ( self.new_item_list_generate_doc )
+            if not self._IS_ADDING_CHECKBOXES:
+                self.update_list_for_generate_page ()
+            # print ( "generate page search button")
+
+    # NOTE - updating Checkboxes
+    def update_list_for_generate_page(self):
+        self._IS_ADDING_CHECKBOXES = True
+
+        self.disable_g1 ()
+        self.disable_ge2 ()
+        self.diasble_side_bar ()
+
+        
+
+        try:  
+            checkboxes_to_delete = []          
+            print ("try clearing the layout parent _checkbox")
+            # Clear existing checkboxes
+            for checkbox in self._checkboxes:
+                checkbox.setParent(None)
+            self._checkboxes.clear()
+        except Exception as e:
+            print("Caught an exception: 2 ", e)
+        
+        self._checkboxes = []
+
+        time.sleep (0.5)
+
+        # Clear existing checkboxes
+        try :
+            print ("try clearing the layout parent widget scrollAreaWidgetContents_checkbox")
+            layout = self.ui.scrollarea_checkbox_dirlist_000
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()             
+        except Exception as e:
+            print("Caught an exception: 1", e)
+
+        time.sleep(0.5)  
+        try:
+
+            # Create checkboxes for new items
+            print ("try creating _checkbox")
+            for i, item in enumerate(self.new_item_list_generate_doc):
+                checkbox = QCheckBox(item)
+                self.ui.scrollarea_checkbox_dirlist_000.addWidget(checkbox)
+                self._checkboxes.append(checkbox)
+        except Exception as e:
+            print("Caught an exception: 3", e)
+        
+        try :
+            # Delete checkboxes after the update process
+            for checkbox in checkboxes_to_delete:
+                checkbox.deleteLater()
+        except Exception as e:
+            print ( "Deleting checboxes for updating ", e)
+
+        time.sleep (1)
+        
+        print ( "done creating checkbox ")
+        QMessageBox.information(self, "Notice","New document added" )
+        self._IS_ADDING_CHECKBOXES = False
+
+        self.enable_show_g1 ()
+        self.enable_show_ge2 ()
+        self.enable_side_bar ()
 
 
+    ## NOTE - selected items
+    def _selected_items_for_generate_page(self):
+        try:
+            selected_items = [checkbox.text() for checkbox in self._checkboxes if checkbox.isChecked()]
+            return selected_items
+        except Exception as e:
+            print ( "_selected_items_for_generate_page issue ", e )
+            return []
 
 
     ## Function For Changing Page TO 
@@ -239,15 +335,20 @@ class MainWindow( QMainWindow ):
 
 
     def on_pushButton_2_genetate_toggled ( self):
-       self.generate_page ()
-       # page menu setting
-       if not self._IS_CREATING_MENU :
-           self._IS_CREATING_MENU = True
-           self.make_drop_down_menu()
+        try:
+            self.generate_page ()
+            
+            # page menu setting
+            if not self._IS_CREATING_MENU :
+                self._IS_CREATING_MENU = True
+                self.make_drop_down_menu()
+        except Exception as e:
+            print("Caught an exception:", e)
        
     
     def on_pushButton_3_genetate_toggled ( self):
-        self.generate_page ()
+        # self.generate_page ()
+        print ("on_pushButton_3_genetate_toggled")
         
 
     def generate_page ( self ):
@@ -261,7 +362,7 @@ class MainWindow( QMainWindow ):
         self._IS_NORMAL_PAGE = False
         
         # clear the checbox layout
-        layout = self.ui.scrollarea_checkbox_dirlist.layout()
+        layout = self.ui.scrollarea_checkbox_dirlist_000.layout()
         if layout:
             while layout.count():
                 item = layout.itemAt(0)
@@ -1493,10 +1594,77 @@ class MainWindow( QMainWindow ):
         self._search_path_list = result_list
         self.update_search_path()
 
-    
-
     #  -------------------------------------------------------------------------------/>
     ## !SECTION
+
+
+
+
+
+    ## SECTION - for generating document
+    #  -------------------------------------------------------------------------------->
+    #
+    ## SECTION -  arrow button
+    # on clicked on the arrow button
+    def on_button_add_list_to_generate_pressed ( self ):
+        print ( "Arrow Button Pressed", self._selected_items_for_generate_page () )
+        
+        # update list
+        self.update_list_for_document_generation_left_Side ()
+
+
+
+    # NOTE -  left side list adding
+    def update_list_for_document_generation_left_Side ( self ):
+        # try list to ListWidget
+        try:
+            # save value inside generate doc list
+            self.add_new_values_to_generate_doc_list ( self._selected_items_for_generate_page () )
+
+            # make the ListWidget clear first
+            self.ui.listWidget.clear ()
+
+            # adding "self.generate_doc_list" list to the ListWidget
+            self.ui.listWidget.addItems ( self.generate_doc_list   )
+
+            # adding drag and reorder options
+            self.ui.listWidget.setDragDropMode(QListWidget.InternalMove)
+
+        except Exception as e:
+            print ( "Problem creating list for generating page ", e )
+
+
+
+    # functions to stores only new path to the "self.generate_doc_list"
+    def add_new_values_to_generate_doc_list(self, new_values_list):
+        print ( "given list in \"add_new_values_to_generate_doc_list\"", new_values_list )
+        try:
+            for value in new_values_list:
+                if value not in self.generate_doc_list:
+                    self.generate_doc_list.append(value)
+        except Exception as e:
+            print (" trying to add values to the left side  ", e)
+
+    ## !SECTION -  arrow button
+
+
+
+    ## SECTION -  CROSS BUTTON 
+    def on_button_clear_list_to_generate_pressed ( self ):
+        print ( "Cross button pressed  selected items " )
+    ## !SECTION -  CROSS BUTTON 
+
+
+
+    ## SECTION -  Generate Document
+    def on_pushButton_generate_doc_pressed ( self ):
+        print ( "Generate doc button pressed " )
+    ## !SECTION -  Generate Document
+    #
+    #
+    #  -------------------------------------------------------------------------------/>
+    ## !SECTION - for generaitng documnet
+
 
 
 

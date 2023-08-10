@@ -538,6 +538,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="search_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
                 <property name="text">
                  <string>Search</string>
                 </property>
@@ -597,7 +600,7 @@
       <item>
        <widget class="QStackedWidget" name="page_stackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="generate_page">
          <layout class="QGridLayout" name="gridLayout_4">
@@ -669,7 +672,7 @@
                   </property>
                   <layout class="QGridLayout" name="gridLayout_3">
                    <item row="0" column="0">
-                    <layout class="QVBoxLayout" name="scrollarea_checkbox_dirlist">
+                    <layout class="QVBoxLayout" name="scrollarea_checkbox_dirlist_000">
                      <property name="spacing">
                       <number>0</number>
                      </property>

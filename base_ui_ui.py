@@ -263,6 +263,7 @@ class Ui_MainWindow(object):
 
         self.search_btn = QPushButton(self.header_widget)
         self.search_btn.setObjectName(u"search_btn")
+        self.search_btn.setCursor(QCursor(Qt.PointingHandCursor))
         icon7 = QIcon()
         icon7.addFile(u":/icon/icon/search-13-48.ico", QSize(), QIcon.Normal, QIcon.Off)
         self.search_btn.setIcon(icon7)
@@ -333,96 +334,96 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents_checkbox.setGeometry(QRect(0, 0, 260, 309))
         self.gridLayout_3 = QGridLayout(self.scrollAreaWidgetContents_checkbox)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.scrollarea_checkbox_dirlist = QVBoxLayout()
-        self.scrollarea_checkbox_dirlist.setSpacing(0)
-        self.scrollarea_checkbox_dirlist.setObjectName(u"scrollarea_checkbox_dirlist")
+        self.scrollarea_checkbox_dirlist_000 = QVBoxLayout()
+        self.scrollarea_checkbox_dirlist_000.setSpacing(0)
+        self.scrollarea_checkbox_dirlist_000.setObjectName(u"scrollarea_checkbox_dirlist_000")
         self.checkBox = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox.setObjectName(u"checkBox")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox)
 
         self.checkBox_5 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_5.setObjectName(u"checkBox_5")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_5)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_5)
 
         self.checkBox_10 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_10.setObjectName(u"checkBox_10")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_10)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_10)
 
         self.checkBox_8 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_8.setObjectName(u"checkBox_8")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_8)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_8)
 
         self.checkBox_9 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_9.setObjectName(u"checkBox_9")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_9)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_9)
 
         self.checkBox_13 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_13.setObjectName(u"checkBox_13")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_13)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_13)
 
         self.checkBox_14 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_14.setObjectName(u"checkBox_14")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_14)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_14)
 
         self.checkBox_17 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_17.setObjectName(u"checkBox_17")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_17)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_17)
 
         self.checkBox_12 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_12.setObjectName(u"checkBox_12")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_12)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_12)
 
         self.checkBox_11 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_11.setObjectName(u"checkBox_11")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_11)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_11)
 
         self.checkBox_16 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_16.setObjectName(u"checkBox_16")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_16)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_16)
 
         self.checkBox_15 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_15.setObjectName(u"checkBox_15")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_15)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_15)
 
         self.checkBox_7 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_7.setObjectName(u"checkBox_7")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_7)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_7)
 
         self.checkBox_6 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_6.setObjectName(u"checkBox_6")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_6)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_6)
 
         self.checkBox_4 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_4.setObjectName(u"checkBox_4")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_4)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_4)
 
         self.checkBox_3 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_3.setObjectName(u"checkBox_3")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_3)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_3)
 
         self.checkBox_2 = QCheckBox(self.scrollAreaWidgetContents_checkbox)
         self.checkBox_2.setObjectName(u"checkBox_2")
 
-        self.scrollarea_checkbox_dirlist.addWidget(self.checkBox_2)
+        self.scrollarea_checkbox_dirlist_000.addWidget(self.checkBox_2)
 
 
-        self.gridLayout_3.addLayout(self.scrollarea_checkbox_dirlist, 0, 0, 1, 1)
+        self.gridLayout_3.addLayout(self.scrollarea_checkbox_dirlist_000, 0, 0, 1, 1)
 
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_checkbox)
 
@@ -702,7 +703,7 @@ class Ui_MainWindow(object):
         self.pushButton_2_genetate.clicked.connect(self.pushButton_3_generate.setChecked)
         self.pushButton_3_generate.clicked.connect(self.pushButton_2_genetate.setChecked)
 
-        self.page_stackedWidget.setCurrentIndex(1)
+        self.page_stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)

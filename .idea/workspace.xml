@@ -2,21 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="db5b878f-2637-4420-845f-9ffd47a3048a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DB/db.json" beforeDir="false" afterPath="$PROJECT_DIR$/DB/db.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/base_ui.ui" beforeDir="false" afterPath="$PROJECT_DIR$/base_ui.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/base_ui_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/base_ui_ui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/old_files/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/test/adding_combobox.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/test/data.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/test/directory_view.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/test/dynamiccombobox.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/test/read_tinydb.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/test/style.qss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/upload.py" beforeDir="false" afterPath="$PROJECT_DIR$/module/upload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource_rc.py" beforeDir="false" afterPath="$PROJECT_DIR$/resource_rc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource_ui2.py" beforeDir="false" afterPath="$PROJECT_DIR$/resource_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resource_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/resource_ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
