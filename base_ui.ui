@@ -900,7 +900,7 @@
              <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
-                <widget class="QLabel" name="label">
+                <widget class="QLabel" name="label_new_doc_name">
                  <property name="font">
                   <font>
                    <pointsize>12</pointsize>
@@ -912,7 +912,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit">
+                <widget class="QLineEdit" name="lineEdit_new_doc_name">
                  <property name="font">
                   <font>
                    <pointsize>12</pointsize>
@@ -1245,8 +1245,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>633</width>
-                  <height>148</height>
+                  <width>98</width>
+                  <height>28</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_6"/>

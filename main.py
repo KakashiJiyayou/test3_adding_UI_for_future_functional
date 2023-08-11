@@ -1652,6 +1652,14 @@ class MainWindow( QMainWindow ):
     ## SECTION -  CROSS BUTTON 
     def on_button_clear_list_to_generate_pressed ( self ):
         print ( "Cross button pressed  selected items " )
+        try:
+            # make the ListWidget clear first
+            self.ui.listWidget.clear ()
+            self.generate_doc_list.clear ()
+        except Exception as e:
+            print (" trying to remove list  from left side ", e)
+            
+
     ## !SECTION -  CROSS BUTTON 
 
 
