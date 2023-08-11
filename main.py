@@ -18,6 +18,9 @@ import datetime
 import subprocess
 import traceback, sys
 
+from docx import Document
+from PIL import Image
+from docxcompose.composer import Composer
 
 
 try:
@@ -33,6 +36,8 @@ try:
     from module import database as Database
     from module import Create_Menu_From_MD as Read_Write_Menu
     from bypy import  ByPy
+
+    bp = ByPy()
 except:
     traceback.print_exc()
 
@@ -1665,8 +1670,291 @@ class MainWindow( QMainWindow ):
 
 
     ## SECTION -  Generate Document
+    #  
+
     def on_pushButton_generate_doc_pressed ( self ):
         print ( "Generate doc button pressed " )
+
+        # get item from left side
+        doc_items = self.get_list_from_left_Side ()
+
+        # only get the directory
+        doc_items = self.extract_filenames_with_directory_left_Side ( doc_items )
+
+        # get new doc name
+        user_given_doc_name = self.get_new_genrated_doc_name ()
+
+        # Prompt the user to choose an output folder
+        output_folder = QFileDialog.getExistingDirectory(self, "Select Output Folder")
+        name = self.ui.lineEdit_new_doc_name.text ().strip ()
+        if output_folder and len (name) >1:
+                print("Got folder location:", output_folder)
+                # download all from baidu
+                self.download_files_from_baidu_to_temp ( doc_items, output_folder )
+        else :
+            warning_text = "No output folder selected or no file name provided\n未选择输出文件夹。 或未提供文件名"
+            QMessageBox.warning(self, "Warning / 警告", warning_text)
+
+        
+
+
+    ## SECTION - worker class to download
+    # show current progress, starting function and proccessed finished one
+    # 
+    def download_files_from_baidu_to_temp ( self,  baidu_file_list, output_folder ):
+
+        self.progress_dialog = ProgressDialog(self, "Generating Document pls wait")
+        self.progress_dialog.show()
+
+        worker = WorkQT.Worker ( self.generate_document_ongoing_proccess, baidu_file_list, output_folder )
+        worker.signals.progress.connect ( self.generate_document_ongoing_progress )
+        worker.signals.finished.connect ( self.generate_document_finsihed )
+
+        self.threadpool.start ( worker )
+
+
+    # let's check the downloaded files
+    def check_download_status_for_generating_page ( self, downloaded_files, path):
+        # Get the list of base names of downloaded files
+        downloaded_base_names = [os.path.basename(downloaded_file) for downloaded_file in downloaded_files]
+        
+        # print ( "check_download_status_for_generating_page ",  downloaded_base_names, "\nfor given file list ", downloaded_files )
+        # Get the list of base names of existing files in the path
+        existing_files = [os.path.basename(existing_file) for existing_file in os.listdir(path)]
+        
+        # Check if all downloaded files exist in the existing files
+        all_files_downloaded = all(downloaded_base_name in existing_files for downloaded_base_name in downloaded_base_names)
+        
+        # Create a list of missing files
+        missing_files = [downloaded_base_name for downloaded_base_name in downloaded_base_names if downloaded_base_name not in existing_files]
+        
+        # Set the status based on whether all files are downloaded
+        status = "ok" if all_files_downloaded else "error"
+        
+        # Create the response dictionary
+        response = {
+            "all_file_downloaded": all_files_downloaded,
+            "missing_files": missing_files,
+            "status": status
+        }
+        
+        return response
+        
+
+    # let's show an window
+    def show_download_status_for_generating_page ( self,  response ):
+        message_box = QMessageBox( self )
+        message_box.setWindowTitle("Download Status")
+        
+        if response["all_file_downloaded"]:
+            message_box.setIcon(QMessageBox.Information)
+            message_box.setText("All files downloaded successfully.")
+        else:
+            message_box.setIcon(QMessageBox.Warning)
+            missing_files = "\n ".join(response["missing_files"])
+            message_box.setText(f"Some files were not downloaded: {missing_files}")
+        
+        message_box.setStandardButtons(QMessageBox.Ok)
+        message_box.show()
+
+
+    # now lets create a file for selected documents
+    def add_files_to_doc( self, file_list, folder_path, output_filename, output_folder):
+        doc = Document()
+        composer = Composer(doc)
+
+        print("File list ", file_list)
+
+        # Set the standard height for images
+        standard_height = 300  # You can adjust this value
+
+        for filename in file_list:
+            file_path = os.path.join(folder_path, filename)
+            print(" add_files_to_doc file path ", file_path)
+
+            try:
+                if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    img = Image.open(file_path)
+                    img = img.convert('RGB')
+
+                    # Set the desired aspect ratio (height-to-width ratio)
+                    desired_aspect_ratio = 0.75  # You can adjust this value
+
+                    # Calculate the new width based on the standard height and desired aspect ratio
+                    new_width = int(standard_height / desired_aspect_ratio)
+
+                    # Resize the image to the new dimensions (standard_height x new_width)
+                    img = img.resize((new_width, standard_height), Image.ANTIALIAS)
+
+                    temp_image_path = os.path.join(output_folder, 'temp_image.jpg')
+                    img.save(temp_image_path, format='JPEG')
+                    doc.add_picture(temp_image_path)
+                    os.remove(temp_image_path)
+
+                elif filename.lower().endswith(('.doc', '.docx')):
+                    docx_content = Document(file_path)
+                    composer.append(docx_content)
+
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+
+        output_path = os.path.join(output_folder, output_filename)
+        composer.save(output_path)
+        print(f"Document '{output_filename}' saved successfully in '{output_folder}'.")
+
+
+
+    # 
+    def generate_document_ongoing_proccess ( self,  baidu_file_list, output_folder, progress_callback ):
+
+        # Check for unsupported extensions
+        unsupported_extensions = ['jpg', 'jpeg', 'png', 'doc', 'docx']
+        unsupported_files = [file for file in baidu_file_list if not any(file.endswith(ext) for ext in unsupported_extensions)]
+
+        if unsupported_files:
+            progress_callback.emit("extensionerror")
+            return
+        #download folder path 
+        path = M_upload.get_directory_path ( )
+        print ( "path to download ", path  )
+
+        # clear dir
+        result = M_upload.clear_temp_dir ( )
+        print ( "Directory is ready for left side list downlaod ", result )
+
+        # download files
+        try:
+            self.setEnabled(False)  # Disable the main window
+            total_files = len(baidu_file_list)
+            for index, baidu_file in enumerate(baidu_file_list):
+                # Calculate the progress percentage
+                progress_percentage = int((index + 1) / total_files * 100)
+                # Combine the progress percentage
+                progress_info = f"progress::{progress_percentage}"
+                # Emit progress callback with the progress information
+                progress_callback.emit(progress_info)
+
+                baidu_file = "/ONDUP/"+ baidu_file
+                
+                # Download the file using bypy
+                bp.download(baidu_file, path)
+                print(f"Downloaded file {index + 1}/{total_files}: {baidu_file}")
+            
+            print("Files downloaded successfully.")
+            time.sleep (1)
+        except Exception as e:
+            
+            self.setEnabled(True)  # Enable the main window
+            print("An error occurred:", e)
+
+
+        try:
+            result = self.check_download_status_for_generating_page ( baidu_file_list, path )
+            print ( "rsult ", result )
+            if result.get("all_file_downloaded"):
+                print ( "all file downlaoded" )
+            else:
+                print ( "all file are not downlaoded" )
+                response_string = str(result)
+                progress_callback.emit(response_string)
+        except Exception as e:
+            
+            self.setEnabled(True)  # Enable the main window
+            print("An error occurred:", e)
+
+        if result.get("all_file_downloaded"):
+            time.sleep (3)
+            file_list = [os.path.basename(path) for path in baidu_file_list]
+            
+            folder_path = path
+            name = self.ui.lineEdit_new_doc_name.text ()
+            name = name.strip ()
+
+            if len (name) > 1 :
+                output_filename = name + ".doc"
+            else:
+                output_filename = 'output.doc'
+            
+            
+            self.add_files_to_doc ( file_list, folder_path, output_filename, output_folder )
+            
+            
+                
+            ##TODO - will ask user to provide a folder location
+            M_upload.clear_temp_dir ()
+
+
+    
+    #
+    def generate_document_ongoing_progress(self, progress_response):
+        if progress_response.startswith("progress::"):
+            # Extract the percentage from the progress string
+            progress_percentage = int(progress_response.split("::")[-1])
+            # Update the progress bar with the extracted percentage
+            self.progress_dialog.progress_bar.setValue(progress_percentage)
+            print("from \"generate_document_ongoing_progress\" Progress:", progress_percentage)
+        elif progress_response == "extensionerror":
+            # Handle extension error
+            message_box = QMessageBox( self )
+            message_box.setWindowTitle("Extension Error")
+            message_box.setIcon(QMessageBox.Warning)
+            message_box.setText("Only files with extensions: jpg, jpeg, png, doc, docx are supported.")
+            message_box.setStandardButtons(QMessageBox.Ok)
+            message_box.show()
+
+            self.progress_dialog.close()
+            self.setEnabled(True)  # Enable the main window
+        else:
+            response = eval(progress_response)
+            if response.get("all_file_downloaded"):
+                print("All files downloaded successfully.")
+            else:
+                print("Some files were not downloaded:", ", ".join(response["missing_files"]))
+
+            self.progress_dialog.close()
+            self.setEnabled(True)  # Enable the main window
+            self.show_download_status_for_generating_page(response)
+
+
+    #
+    def generate_document_finsihed( self ):
+        self.setEnabled(True)  # Enable the main window
+        self.progress_dialog.close()
+        print ( "done generating new document" )
+
+    #
+    ##  
+    ## !SECTION - 
+
+    def get_list_from_left_Side ( self ):
+        try:
+            ordered_items = [self.ui.listWidget.item(i).text() for i in range(self.ui.listWidget.count())]
+            print("Pressed Generated Button :: reordered list", ordered_items)
+            return ordered_items
+        except Exception as e:
+            print("An error occurred:", e)
+            return []
+
+
+    def get_new_genrated_doc_name ( self ):
+        try:
+            text = self.ui.lineEdit_new_doc_name.text ()
+            print (  "Pressed Genrated Button :: new doc name ", text  )
+            return text
+        except Exception as e:
+            print("An error occurred:", e)
+            return None
+
+    
+
+    def extract_filenames_with_directory_left_Side( self,  data_list ):
+        try:
+            extracted_filenames = [item.split('Directory:')[-1].strip() for item in data_list if 'Directory:' in item]
+            return extracted_filenames
+        except Exception as e:
+            print("Error:", e)
+            return []
+
     ## !SECTION -  Generate Document
     #
     #
@@ -2023,6 +2311,13 @@ class CheckPassWord() :
             traceback.print_exc()
 #!SECTION - password
 
+## STUB - Class for Progress bar 
+class ProgressDialog(QDialog):
+    def __init__(self, parent=None, title="Download Progress"):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setGeometry(10, 10, 300, 30)
 
 ### start the app
 if __name__ == "__main__":
