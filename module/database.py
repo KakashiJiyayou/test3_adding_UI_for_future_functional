@@ -2,11 +2,16 @@ import datetime
 import traceback
 from tinydb import TinyDB, Query , where
 
-
-
-
-# path for db
 db = TinyDB( './DB/db.json' )
+
+def open_db_connection ():
+    global db
+    # path for db
+    db = TinyDB( './DB/db.json' )
+
+def close_db_connection():
+    global db
+    db.close()
 
 
 # SECTION Directory table

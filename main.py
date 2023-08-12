@@ -34,6 +34,8 @@ try:
     from module import upload as M_upload
     from module import worker_pyqt as WorkQT
     from module import database as Database
+    from module import runningdb as DatabaseRunning
+    from module import database_management as DB_MGM
     from module import Create_Menu_From_MD as Read_Write_Menu
     from bypy import  ByPy
 
@@ -361,7 +363,7 @@ class MainWindow( QMainWindow ):
         # page index to 0
         self._current_page_index = 1
         self.update_page_status ()
-        
+        self.ui.search_input.setDisabled (  )
         self.ui.page_stackedWidget.setCurrentIndex (0)
         
         self._IS_NORMAL_PAGE = False
@@ -577,6 +579,8 @@ class MainWindow( QMainWindow ):
                     else :
                         self.show_popup_text ( "未选择文件", "首先在搜索区域中输入文本，然后选择要更改的文件")
 
+            else:
+                self.update_progressbar ( 100 )
         else:
             # update progressbar
             self.update_progressbar ( 100 )
@@ -601,9 +605,11 @@ class MainWindow( QMainWindow ):
             print ( " failled to remove " )
         else :
             try:
-
+                self.open_database ()
 
                 print ( Database.delete_path_list ( path ) )
+
+                self.close_database ()
 
                 pass
             except Exception as e:
@@ -720,9 +726,15 @@ class MainWindow( QMainWindow ):
 
 
             try:
+
+                self.open_database ()
+
                 # get database value for giben *path*
                 result = Database.get_info_based_on_path ( path )
                 print ( " on_pushButton_update_pressed  ", str ( result ) )
+
+                self.close_database ()
+
             except Exception as e :
                 result = ["none"]
                 print ("failled to insert for updating ", e)
@@ -865,8 +877,13 @@ class MainWindow( QMainWindow ):
                 new_file_path_bypy +=  new_file_name
                 list1 =  new_file_path_bypy 
                 try:
+                    self.open_database ()
+
                     insert_db = Database.insert_dir_list( list1, menu )
                     print (" file uplaoded done , insert_db ", insert_db)
+
+                    self.close_database ()
+
                 except Exception as e :
                     print ( "failed to indert for update ", e )
                 progress_callback.emit ( "(file upload done )文件上传完成" + str (new_file_path_bypy) )
@@ -1118,8 +1135,12 @@ class MainWindow( QMainWindow ):
                 if self.subproccess_check_file_exists ( temp_file_name, progress_callback ):
                     # insterting data
                     try :
+                        self.open_database ()
+
                         insert_result = Database.insert_dir_list ( item, menu )
                         print ( "DB insert result" , insert_result )
+
+                        self.close_database()
                     except Exception as e:
                         print ( "failed to insert for uplaod ", e )
             
@@ -1581,7 +1602,12 @@ class MainWindow( QMainWindow ):
 
         # call database to get data on this 
         try :
+            self.open_database ()
+
             result_list = Database.get_dir_list( filter_menu )
+            # print ("result on change text search input ", result_list)
+
+            self.close_database ()
         except Exception as e :
             result_list = []
             print ( "get_search_path_list_from_db ", e )
@@ -1614,14 +1640,19 @@ class MainWindow( QMainWindow ):
 
         # call database to get data on this 
         try :
+            self.open_database ()
+
             result_list = Database.get_dir_list( filter_menu )
+
+            self.close_database()
+
         except Exception as e :
             result_list = []
             print ( "on_search_input_textChanged ", e )
         # print ( result_list )
 
         # put the list in self._search_path_list
-        print ( "search result ", result_list )
+        # print ( "search result ", result_list )
         self._search_path_list = result_list
         self.update_search_path()
 
@@ -2047,6 +2078,23 @@ class MainWindow( QMainWindow ):
         dlg.setStandardButtons ( QMessageBox.Ok )
         dlg.exec ()
 
+    ## NOTE - Close database
+    def close_database ( self ):
+        try:
+            Database.close_db_connection()
+            DatabaseRunning.close_connection ()
+        except:
+            traceback.print_exc ()
+
+    ## NOTE - Open database
+    def open_database ( self ):
+        try:
+            Database.open_db_connection()
+            DatabaseRunning.open_connection()
+        except:
+            traceback.print_exc ()
+
+  
 
     # NOTE - using subproccessing to do bypy work 
     def suproccess_show_plaintext ( self, command_list , progress_callback )  :
