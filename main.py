@@ -600,10 +600,14 @@ class MainWindow( QMainWindow ):
         if file_exists :
             print ( " failled to remove " )
         else :
+            try:
 
-            print ( Database.delete_path_list ( path ) )
 
-            pass
+                print ( Database.delete_path_list ( path ) )
+
+                pass
+            except Exception as e:
+                print ( " problem removing the list from database \'remove_proccess\' ",e )
       
 
 
@@ -714,9 +718,16 @@ class MainWindow( QMainWindow ):
             path = search_input.split( "  Directory:" ) [1]
             print ( "Selected Path " , path)
 
-            # get database value for giben *path*
-            result = Database.get_info_based_on_path ( path )
-            print ( " on_pushButton_update_pressed  ", str ( result ) )
+
+            try:
+                # get database value for giben *path*
+                result = Database.get_info_based_on_path ( path )
+                print ( " on_pushButton_update_pressed  ", str ( result ) )
+            except Exception as e :
+                result = ["none"]
+                print ("failled to insert for updating ", e)
+
+
 
             # new file name
             new_file_name = result[0][ "path" ].split ( "/" )[-1]
@@ -853,8 +864,11 @@ class MainWindow( QMainWindow ):
             if file_uploaded :
                 new_file_path_bypy +=  new_file_name
                 list1 =  new_file_path_bypy 
-                insert_db = Database.insert_dir_list( list1, menu )
-                print (" file uplaoded done , insert_db ", insert_db)
+                try:
+                    insert_db = Database.insert_dir_list( list1, menu )
+                    print (" file uplaoded done , insert_db ", insert_db)
+                except Exception as e :
+                    print ( "failed to indert for update ", e )
                 progress_callback.emit ( "(file upload done )文件上传完成" + str (new_file_path_bypy) )
 
             else:
@@ -1103,8 +1117,11 @@ class MainWindow( QMainWindow ):
                 #  check file inserted or not
                 if self.subproccess_check_file_exists ( temp_file_name, progress_callback ):
                     # insterting data
-                    insert_result = Database.insert_dir_list ( item, menu )
-                    print ( "DB insert result" , insert_result )
+                    try :
+                        insert_result = Database.insert_dir_list ( item, menu )
+                        print ( "DB insert result" , insert_result )
+                    except Exception as e:
+                        print ( "failed to insert for uplaod ", e )
             
         
         # clearing temp directory
@@ -1563,7 +1580,12 @@ class MainWindow( QMainWindow ):
         # searc_txt = self.ui.search_input
 
         # call database to get data on this 
-        result_list = Database.get_dir_list( filter_menu )
+        try :
+            result_list = Database.get_dir_list( filter_menu )
+        except Exception as e :
+            result_list = []
+            print ( "get_search_path_list_from_db ", e )
+        
         # print ( result_list )
 
         # put the list in self._search_path_list
@@ -1591,7 +1613,11 @@ class MainWindow( QMainWindow ):
         # searc_txt = self.ui.search_input
 
         # call database to get data on this 
-        result_list = Database.get_dir_list( filter_menu )
+        try :
+            result_list = Database.get_dir_list( filter_menu )
+        except Exception as e :
+            result_list = []
+            print ( "on_search_input_textChanged ", e )
         # print ( result_list )
 
         # put the list in self._search_path_list
