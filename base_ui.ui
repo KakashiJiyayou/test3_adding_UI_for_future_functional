@@ -907,7 +907,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Name</string>
+                  <string>Name &quot;新文件</string>
                  </property>
                 </widget>
                </item>
@@ -917,6 +917,9 @@
                   <font>
                    <pointsize>12</pointsize>
                   </font>
+                 </property>
+                 <property name="placeholderText">
+                  <string>全新文件Give a name ....</string>
                  </property>
                 </widget>
                </item>

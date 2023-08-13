@@ -5,6 +5,8 @@ from module import package_management as _PM
 
 
 import ntpath
+import random
+
 from PyQt5.QtWidgets import  *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -41,7 +43,7 @@ try:
 
     bp = ByPy()
 except:
-    traceback.print_exc()
+    traceback.print_exc() 
 
 """
 #NOTE Main Window---------------------------------Main Window------------------------------------------>  
@@ -91,7 +93,10 @@ class MainWindow( QMainWindow ):
         # for left side generating doc list
         self.generate_doc_list =  []
 
+        # generate user ID
+        self._USER_ID = ''.join(random.choice('ABCDEFGHIJKLMNPQRSTUVWXYZ123456789') for _ in range(5))
 
+        # just setting up the app
         self.setting_up_app()
 
 
@@ -363,7 +368,7 @@ class MainWindow( QMainWindow ):
         # page index to 0
         self._current_page_index = 1
         self.update_page_status ()
-        self.ui.search_input.setDisabled (  )
+        self.ui.search_input.setDisabled ( True )
         self.ui.page_stackedWidget.setCurrentIndex (0)
         
         self._IS_NORMAL_PAGE = False
@@ -490,6 +495,8 @@ class MainWindow( QMainWindow ):
             self.ui.pushButton_upload.setText ( "Upload" )
             self.ui.search_btn.setText ( "Search" )
             self.ui.pushButton_2_change_password.setText ( "Change Password" )
+            self.ui.pushButton_3_generate.setText ( "Generate" )
+            self.ui.pushButton_generate_doc.setText ( "Generate Doc")
 
         else :
             self.ui.home_btn_2.setText ( "上传" )
@@ -502,6 +509,8 @@ class MainWindow( QMainWindow ):
             self.ui.pushButton_upload.setText ( "上传" )
             self.ui.search_btn.setText ( "搜索" )
             self.ui.pushButton_2_change_password.setText ("更改密碼")
+            self.ui.pushButton_3_generate.setText ( "生成文档" )
+            self.ui.pushButton_generate_doc.setText ( "生成文档" )
 
 
 
@@ -587,7 +596,14 @@ class MainWindow( QMainWindow ):
 
     def remove_proccess(self, path , progress_callback):
 
-        # update progressbar
+        # check database is in use or not
+        if self.database_is_in_use ():
+            progress_callback.emit ("Database is in USE")
+            return 0
+        else:
+            self.make_database_status_running ()
+
+
        
 
         # lets get path and the file name
@@ -615,8 +631,12 @@ class MainWindow( QMainWindow ):
             except Exception as e:
                 print ( " problem removing the list from database \'remove_proccess\' ",e )
       
+        self.make_database_status_free ()
 
 
+    def remove_progress (  self, s ):
+        if "Database is in USE" in s:
+            self.show_popup_text ( "Database is in USE 数据库正在使用中" )
 
     def removed (self):
         print ( "File removed")
@@ -826,6 +846,12 @@ class MainWindow( QMainWindow ):
         
 
         if not len (  new_file_location_pc ) < 3:
+             # check database is in use or not
+            if self.database_is_in_use ():
+                progress_callback.emit ("Database is in USE")
+                return 0
+            else:
+                self.make_database_status_running ()
             
             print("Given file path ", new_file_location_pc)
             
@@ -896,13 +922,15 @@ class MainWindow( QMainWindow ):
             # clear temp dir
             print ( M_upload.clear_temp_dir () )
 
-
+        self.make_database_status_free ()
 
 
     # progress
     def update_show_progress(self, s):     
         self.ui.plainText_show.setPlainText ( s )   
         print (s)
+        if "Database is in USE" in s:
+            self.show_popup_text ( "Database is in USE 数据库正在使用中" )
 
 
     def update_complete(self ):
@@ -931,7 +959,6 @@ class MainWindow( QMainWindow ):
     ## when click upload button --------------------------------------------------->
 
     def on_pushButton_upload_pressed( self ):
-
         #
         self.Upload_Button_Clicked = True
 
@@ -1034,7 +1061,7 @@ class MainWindow( QMainWindow ):
             worker.signals.result.connect(self.show_result)
             worker.signals.finished.connect(self.thread_complete)
 
-            time.sleep(2)
+            time.sleep(0.5)
             
             self.update_progressbar ( 20 ) ############## update progressbar
             self.threadpool.start(worker)
@@ -1158,10 +1185,77 @@ class MainWindow( QMainWindow ):
 
 
 
+    ## NOTE - CHeck database in use 
+    #  
+    def database_is_in_use ( self ):
+
+        # first close the database
+        self.close_database()
+
+        # 2nd Download running.db and it's just downloading as
+        #  database db also will be needed
+        DB_MGM.download_db_file ()
+        DB_MGM.download_db_running ()
+
+        # 3rd reopen database connection
+        self.open_database ()
+
+        # 4th check running db whther user using them or not
+        result, using_user_id = DatabaseRunning.is_database_in_use()
+
+        # 5th close database connection
+        self.close_database ()
+
+        # now if database is in use check user id too,
+        # if they are same user, then just say not in use 
+        # Means, even if running db shwos status running , 
+        # The return result will be false
+        if result :
+            using_user_id = using_user_id.strip ()
+            if using_user_id == self._USER_ID:
+                return False
+        
+        return result
+    
+
+    ## NOTE - Free Database status
+    # also upload DB and DB_Running file
+    def make_database_status_free ( self ):
+
+        # 1st open database
+        self.open_database ()
+
+        # 2nd change the stutus free and user_id NONE
+        DatabaseRunning.change_status ( "free", self._USER_ID )
+
+        # 3rd close database
+        self.close_database ()
+
+        # 4th upload it to the baidu
+        DB_MGM.upload_db_running ()
+        DB_MGM.upload_db_file ()
+
+    
+    ## NOTE - Free Database status
+    # also upload DB and DB_Running file
+    def make_database_status_running ( self ):
+
+        # 1st open database
+        self.open_database ()
+
+        # 2nd change the stutus free and user_id NONE
+        DatabaseRunning.change_status ( "running", self._USER_ID )
+
+        # 3rd close database
+        self.close_database ()
+
+        # 4th upload it to the baidu
+        DB_MGM.upload_db_running ()
+        DB_MGM.upload_db_file ()
+
     
     ## SECTION  WORKER Class method For Upload
-    def ongoing_proccess(self,file_path,progress_callback):
-        
+    def ongoing_proccess(self,file_path,progress_callback):  
         # show thar process starte
         progress_callback.emit("Process started")
 
@@ -1194,18 +1288,21 @@ class MainWindow( QMainWindow ):
 
         else :
 
-            self.unzip_upload_insert ( file_path, all_text, progress_callback )
-            # progress_callback.emit("menu  selected")
+            # chec whether database is in use
+            if self.database_is_in_use ():
+                progress_callback.emit ( "Database is in USE" )
+                return None
+            
+            # now change the database status
+            else :
+                self.make_database_status_running ()
+            try:
+                self.unzip_upload_insert ( file_path, all_text, progress_callback )
+            except Exception as e :
+                print ( "self.unzip_upload_insert ", e )
 
-
-        #
-        # if (self.M_Uplaod.is_zip_file(file_path)):
-        #     pass
-
-        # for n in range(1,100):
-        #     value = "Checking file type for given '" + file_path + "' Pls Wait"
-        #     progress_callback.emit(value)
-        #     time.sleep(1)
+            # free up using the database
+            self.make_database_status_free ()
 
         return "Finished Uploading"
 
@@ -1219,7 +1316,8 @@ class MainWindow( QMainWindow ):
                 self.show_popup_text ( "Menu missing !!", " All menu not selected, please select all menu first then click upload" )
             else :
                 self.show_popup_text ( "菜单缺失！！","所有菜单未选择，请先选择所有菜单然后点击上传" )
-
+        elif "Database is in USE" in s:
+            self.show_popup_text ( "Database is in USE 数据库正在使用中" )
     ## result
     def show_result(self, s):
         print("Showing resutl done for this even ",s)
@@ -1936,8 +2034,6 @@ class MainWindow( QMainWindow ):
             self.add_files_to_doc ( file_list, folder_path, output_filename, output_folder )
             
             
-                
-            ##TODO - will ask user to provide a folder location
             M_upload.clear_temp_dir ()
 
 
@@ -2375,6 +2471,8 @@ class CheckPassWord() :
         data = json.load(f)
         password = data["password"]
 
+        f.close()
+
         return password
 
 
@@ -2396,6 +2494,9 @@ class ProgressDialog(QDialog):
 ### start the app
 if __name__ == "__main__":
     try:
+
+        Database.open_db_connection ()
+        DatabaseRunning.open_connection ()
 
         # #  first check password exists in baidu or not
         #
@@ -2449,7 +2550,11 @@ if __name__ == "__main__":
             app.setStyleSheet(style_str)
 
             window = MainWindow()
-            window
+            
+            window.close_database ()
+            DB_MGM.download_db_file ()
+            DB_MGM.download_db_running ()
+
             window.show()
             window.setWindowIcon(QIcon('icon/Logo.png'))
             app.setWindowIcon(QIcon('icon/Logo.png'))
@@ -2462,6 +2567,8 @@ if __name__ == "__main__":
     # time.sleep(100)
     # sys.exit()
     print("closing the application")
+    window.close_database ()
+    DB_MGM.upload_db_file ()
     time.sleep(3)
 
 
