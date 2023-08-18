@@ -185,9 +185,8 @@ try:
     print ( "crating directory" )
     path = get_directory_path ()
     os.mkdir ( path )
-except:
-    traceback.print_exc()
-
+except Exception as e:
+    print ("get_directory_path upload module ", e)
 
 """ ==========================START=============================== """
 """ COMMON METHODS to give data to the UI"""

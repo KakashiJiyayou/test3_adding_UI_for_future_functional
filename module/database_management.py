@@ -1,7 +1,7 @@
 import os
-import shutil
 import bypy
 import time
+import ntpath
 import subprocess
 import traceback
 
@@ -42,18 +42,28 @@ def download_file(baidu_path, local_file_path):
 def upload_file(local_file_path, baidu_path):
     try:
         bp = bypy.ByPy()
+        bp.remove(baidu_path)
         bp.upload(local_file_path, baidu_path)
 
-        output = subprocess.check_output(["bypy", "list", baidu_path], universal_newlines=True)
-        if "Found" in output or "found" in output:
-            bp.remove(baidu_path)
-            bp.copy(baidu_path.replace("backup/", ""), baidu_path)
+        # Extract base filename
+        base_filename = os.path.basename(baidu_path)
 
-            output = subprocess.check_output(["bypy", "list", baidu_path], universal_newlines=True)
-            if "Found" in output or "found" in output:
-                bp.remove(baidu_path.replace("backup/", ""))
+        # Extract path
+        file_path = os.path.dirname(baidu_path)
 
-        return True
+        output = subprocess.check_output(["bypy", "search", base_filename, file_path ], universal_newlines=True)
+        # print ( "OUTPUT FROM DBMGM 1 ", output,"\t baidu_path", baidu_path)
+        if "Nothing found" not in output and(  "Found" in output or "found" in output):
+            bp.remove(baidu_path.replace("backup/", ""))
+            bp.copy(baidu_path , baidu_path.replace("backup/", "") )
+
+            output = subprocess.check_output(["bypy", "search", base_filename , file_path.replace("backup/", "")], universal_newlines=True)
+            # print ( "OUTPUT FROM DBMGM 2", output)
+            if "Nothing found" not in output and(  "Found" in output or "found" in output):
+                # bp.remove(baidu_path)
+
+                return True
+            return False
     except Exception as e:
         print(f"Error in upload_file: {e}")
 

@@ -39,6 +39,9 @@ try:
     from module import runningdb as DatabaseRunning
     from module import database_management as DB_MGM
     from module import Create_Menu_From_MD as Read_Write_Menu
+    from module import merge_docs as MDG
+    
+    from module._config import _PATH
     from bypy import  ByPy
 
     bp = ByPy()
@@ -596,40 +599,43 @@ class MainWindow( QMainWindow ):
 
     def remove_proccess(self, path , progress_callback):
 
-        # check database is in use or not
-        if self.database_is_in_use ():
-            progress_callback.emit ("Database is in USE")
-            return 0
-        else:
-            self.make_database_status_running ()
+        try:
+            # check database is in use or not
+            if self.database_is_in_use ():
+                progress_callback.emit ("Database is in USE")
+                return 0
+            else:
+                self.make_database_status_running ()
 
 
-       
+        
 
-        # lets get path and the file name
-        head, tail = os.path.split ( path )
+            # lets get path and the file name
+            head, tail = os.path.split ( path )
 
-        ondup = "ONDUP/" +path
-        command = [ "bypy", "remove" , ondup ]
-        self.suproccess_show_plaintext ( command, progress_callback)
+            ondup = "ONDUP/" +path
+            command = [ "bypy", "remove" , ondup ]
+            self.suproccess_show_plaintext ( command, progress_callback)
 
-        file_exists = self.subproccess_check_file_exists2 ( tail, head, progress_callback  )
+            file_exists = self.subproccess_check_file_exists2 ( tail, head, progress_callback  )
 
-      
+        
 
-        if file_exists :
-            print ( " failled to remove " )
-        else :
-            try:
-                self.open_database ()
+            if file_exists :
+                print ( " failled to remove " )
+            else :
+                try:
+                    self.open_database ()
 
-                print ( Database.delete_path_list ( path ) )
+                    print ( Database.delete_path_list ( path ) )
 
-                self.close_database ()
+                    self.close_database ()
 
-                pass
-            except Exception as e:
-                print ( " problem removing the list from database \'remove_proccess\' ",e )
+                    pass
+                except Exception as e:
+                    print ( " problem removing the list from database \'remove_proccess\' ",e )
+        except Exception as e:
+            print ( "  ",e )
       
         self.make_database_status_free ()
 
@@ -845,82 +851,85 @@ class MainWindow( QMainWindow ):
         
         
 
-        if not len (  new_file_location_pc ) < 3:
+        try:
+            if not len (  new_file_location_pc ) < 3:
              # check database is in use or not
-            if self.database_is_in_use ():
-                progress_callback.emit ("Database is in USE")
-                return 0
-            else:
-                self.make_database_status_running ()
-            
-            print("Given file path ", new_file_location_pc)
-            
-            
-            # copy file it to the temp folder
-            print ( "Clear temp dir ", M_upload.clear_temp_dir())
-            moduel_path  = M_upload.get_directory_path ()
-            shutil.copy ( new_file_location_pc , moduel_path )
+                if self.database_is_in_use ():
+                    progress_callback.emit ("Database is in USE")
+                    return 0
+                else:
+                    self.make_database_status_running ()
+                
+                print("Given file path ", new_file_location_pc)
+                
+                
+                # copy file it to the temp folder
+                print ( "Clear temp dir ", M_upload.clear_temp_dir())
+                moduel_path  = M_upload.get_directory_path ()
+                shutil.copy ( new_file_location_pc , moduel_path )
 
 
-            # get selected file name
-            head, tail = os.path.split ( new_file_location_pc )
-            selected_file_name = tail
+                # get selected file name
+                head, tail = os.path.split ( new_file_location_pc )
+                selected_file_name = tail
 
-            # create a name for the file
-            new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
-            new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
-
-
-            if "_copy(" in new_file_name_witout_extension :
-                head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
-                new_file_name_witout_extension = head
+                # create a name for the file
+                new_file_name_witout_extension = os.path.splitext ( new_file_name )[ 0 ]
+                new_file_only_extension = os.path.splitext( new_file_name )[ 1 ]
 
 
-            now = datetime.datetime.now()
-            now = now.strftime('%m-%d-%y_%H-%M')
-            new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
-            new_file_name = new_file_name_witout_extension + new_file_only_extension
-            print ( "new file name  after adding extension and date ", new_file_name  )
-
-            
-            # rename document 
-            M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
+                if "_copy(" in new_file_name_witout_extension :
+                    head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+                    new_file_name_witout_extension = head
 
 
-            # get upload cmmand
-            command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
+                now = datetime.datetime.now()
+                now = now.strftime('%m-%d-%y_%H-%M')
+                new_file_name_witout_extension = new_file_name_witout_extension + "_copy(" + str ( now )
+                new_file_name = new_file_name_witout_extension + new_file_only_extension
+                print ( "new file name  after adding extension and date ", new_file_name  )
+
+                
+                # rename document 
+                M_upload.rename_file_in_temp ( selected_file_name, new_file_name )
 
 
-            # NOTE - Update Document using subprocces
-            self.suproccess_show_plaintext ( command, progress_callback )
+                # get upload cmmand
+                command = M_upload.get_bypy_upload_command  ( new_file_path_bypy )
 
 
-            # check file upload succcesfull 
-            file_uploaded = self.subproccess_check_file_exists ( new_file_name, progress_callback )
+                # NOTE - Update Document using subprocces
+                self.suproccess_show_plaintext ( command, progress_callback )
 
 
-            if file_uploaded :
-                new_file_path_bypy +=  new_file_name
-                list1 =  new_file_path_bypy 
-                try:
-                    self.open_database ()
+                command = [ "bypy", "search", new_file_name]
+                output2 = subprocess.check_output( command, universal_newlines=True)
+                
 
-                    insert_db = Database.insert_dir_list( list1, menu )
-                    print (" file uplaoded done , insert_db ", insert_db)
+                if  "Nothing found" not in output2 and(  "Found" in output2 or "found" in output2) :
+                    new_file_path_bypy +=  new_file_name
+                    list1 =  new_file_path_bypy 
+                    try:
+                        self.open_database ()
 
-                    self.close_database ()
+                        insert_db = Database.insert_dir_list( list1, menu )
+                        print (" file uplaoded done , insert_db ", insert_db)
 
-                except Exception as e :
-                    print ( "failed to indert for update ", e )
-                progress_callback.emit ( "(file upload done )文件上传完成" + str (new_file_path_bypy) )
+                        self.close_database ()
 
-            else:
-                print ("failed to uplaod file")
-                progress_callback.emit ( "(failled to upload file)文件上传失败" )
+                    except Exception as e :
+                        print ( "failed to indert for update ", e )
+                    progress_callback.emit ( "(file upload done )文件上传完成" + str (new_file_path_bypy) )
+
+                else:
+                    print ("failed to uplaod file")
+                    progress_callback.emit ( "(failled to upload file)文件上传失败" )
 
 
-            # clear temp dir
-            print ( M_upload.clear_temp_dir () )
+                # clear temp dir
+                print ( M_upload.clear_temp_dir () )
+        except Exception as e:
+            print (" ",e)
 
         self.make_database_status_free ()
 
@@ -1125,7 +1134,14 @@ class MainWindow( QMainWindow ):
 
                 progress_callback.emit ( "checking content exists or not 檢查內容是否存在 \t" +str ( new_file_name ) )
 
-                if self.subproccess_check_file_exists (  temp_file_name, progress_callback ) or self.subproccess_check_file_exists (  new_file_name, progress_callback )  :
+                command = [ "bypy", "search", temp_file_name]
+                output1 = subprocess.check_output( command, universal_newlines=True)
+
+                # print ("Output1 ", output1, "\n Output2 ")
+                
+
+                if "Nothing found" not in output1 and  (   "Found" in output1 or "found" in output1 ) :
+                    
                     print (" unzip_upload_insert file name exists " , temp_file_name )
                     # rename document
                     M_upload.rename_file_in_temp ( temp_file_name, new_file_name )
@@ -1149,27 +1165,36 @@ class MainWindow( QMainWindow ):
             barIndex = 0
 
             # use subproccess to uplaod
-            self.suproccess_show_plaintext ( command, progress_callback)
+            try:
+                self.suproccess_show_plaintext ( command, progress_callback)
+            except Exception as e:
+                print ("\t\t",e)
 
             for item in folder_list :
 
                 temp_file_name = ntpath.basename ( str(item) )
-                progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成 " +  str ( temp_file_name ) )
 
-                head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
-                new_file_name_witout_extension = head
+                # head, sep, tail2 = new_file_name_witout_extension.partition('_copy(')
+                # new_file_name_witout_extension = head
                 #  check file inserted or not
-                if self.subproccess_check_file_exists ( temp_file_name, progress_callback ):
-                    # insterting data
-                    try :
-                        self.open_database ()
+                for  i in range ( 3 ):
+                     command = [ "bypy", "search", temp_file_name]
+                     output = subprocess.check_output( command, universal_newlines=True)
+                     if "Nothing found" not in output and (  "Found" in output or "found" in output ):
+                    
+                        progress_callback.emit( "uploading to baidu is done 上传至百度云盘完成 " +  str ( temp_file_name ) )
+                        # insterting data
+                        try :
+                            self.open_database ()
 
-                        insert_result = Database.insert_dir_list ( item, menu )
-                        print ( "DB insert result" , insert_result )
+                            insert_result = Database.insert_dir_list ( item, menu )
+                            print ( "DB insert result" , insert_result )
 
-                        self.close_database()
-                    except Exception as e:
-                        print ( "failed to insert for uplaod ", e )
+                            self.close_database()
+                        except Exception as e:
+                            print ( "failed to insert for uplaod ", e )
+                        break
+               
             
         
         # clearing temp directory
@@ -1226,14 +1251,17 @@ class MainWindow( QMainWindow ):
         self.open_database ()
 
         # 2nd change the stutus free and user_id NONE
-        DatabaseRunning.change_status ( "free", self._USER_ID )
+        print ( DatabaseRunning.change_status ( "free", self._USER_ID ) )
+
+        print ( "DB.json prior to uplaod ", Database.get_dir_list("") )
 
         # 3rd close database
         self.close_database ()
+        time.sleep (3)
 
         # 4th upload it to the baidu
-        DB_MGM.upload_db_running ()
-        DB_MGM.upload_db_file ()
+        print( "updated  db  running",  DB_MGM.upload_db_running () )
+        print( "updated database db", DB_MGM.upload_db_file () )
 
     
     ## NOTE - Free Database status
@@ -1244,21 +1272,27 @@ class MainWindow( QMainWindow ):
         self.open_database ()
 
         # 2nd change the stutus free and user_id NONE
-        DatabaseRunning.change_status ( "running", self._USER_ID )
+        print ( DatabaseRunning.change_status ( "running", self._USER_ID ) )
 
         # 3rd close database
         self.close_database ()
 
         # 4th upload it to the baidu
-        DB_MGM.upload_db_running ()
-        DB_MGM.upload_db_file ()
+        print( "updated  db  running",  DB_MGM.upload_db_running () )
+        print( "updated database db", DB_MGM.upload_db_file () )
 
     
     ## SECTION  WORKER Class method For Upload
     def ongoing_proccess(self,file_path,progress_callback):  
         # show thar process starte
         progress_callback.emit("Process started")
+        print ("ongoing_proccess given path ", file_path)
 
+        if ( len (file_path) < 5 ):
+            time.slee (2)
+            progress_callback.emit ("No file selected 未選擇文件s")
+            
+            return "No file selected 未選擇文件"
 
         # first check all the comboxes selected or not
         all_comboboxes_selected = False
@@ -1287,16 +1321,15 @@ class MainWindow( QMainWindow ):
 
 
         else :
-
-            # chec whether database is in use
-            if self.database_is_in_use ():
-                progress_callback.emit ( "Database is in USE" )
-                return None
-            
-            # now change the database status
-            else :
-                self.make_database_status_running ()
             try:
+                # chec whether database is in use
+                if self.database_is_in_use ():
+                    progress_callback.emit ( "Database is in USE" )
+                    return None
+                
+                # now change the database status
+                else :
+                    self.make_database_status_running ()
                 self.unzip_upload_insert ( file_path, all_text, progress_callback )
             except Exception as e :
                 print ( "self.unzip_upload_insert ", e )
@@ -1317,7 +1350,10 @@ class MainWindow( QMainWindow ):
             else :
                 self.show_popup_text ( "菜单缺失！！","所有菜单未选择，请先选择所有菜单然后点击上传" )
         elif "Database is in USE" in s:
-            self.show_popup_text ( "Database is in USE 数据库正在使用中" )
+            self.show_popup_text ("Busy", "Database is in USE 数据库正在使用中" )
+        elif "No file selected 未選擇文件" in s:
+            self.show_popup_text ("No file selected 未選擇文件", "No file selected 未選擇文件" )
+            self.ui.plainText_show.setPlainText ("No file selected 未選擇文件")
     ## result
     def show_result(self, s):
         print("Showing resutl done for this even ",s)
@@ -1326,7 +1362,7 @@ class MainWindow( QMainWindow ):
     def thread_complete(self):
         print("Thread for uplaod done")
 
-        self.ui.plainText_show.setPlainText ( "Upload Completed 上传完成" )
+        # self.ui.plainText_show.setPlainText ( "Upload Completed 上传完成" )
 
         self.update_progressbar ( 100 ) ############## update progressbar
 
@@ -1488,8 +1524,8 @@ class MainWindow( QMainWindow ):
            
             
         except Exception as e:
-            print("Next Menu Does not exits or other problem" , e)
-            print(traceback.format_exc())
+            print( "'result_for_initial_menu_creation' Next Menu Does not exits or other problem " , e)
+            # print(traceback.format_exc())
 
             # lets check our menu list size
             current_menu_size = len ( self.combo_box_list)
@@ -1915,47 +1951,17 @@ class MainWindow( QMainWindow ):
 
     # now lets create a file for selected documents
     def add_files_to_doc( self, file_list, folder_path, output_filename, output_folder):
-        doc = Document()
-        composer = Composer(doc)
+        # Update each item in the file_list with the joined path
+        updated_file_paths = [os.path.join(folder_path, item) for item in file_list]
 
-        print("File list ", file_list)
+        print ( "add_files_to_doc ",  updated_file_paths)
 
-        # Set the standard height for images
-        standard_height = 300  # You can adjust this value
+        MDG._soffice_path = _PATH
+        MDG._output_dir = folder_path
+        MDG.Merge ( updated_file_paths , folder_path, output_filename , output_folder )
 
-        for filename in file_list:
-            file_path = os.path.join(folder_path, filename)
-            print(" add_files_to_doc file path ", file_path)
-
-            try:
-                if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-                    img = Image.open(file_path)
-                    img = img.convert('RGB')
-
-                    # Set the desired aspect ratio (height-to-width ratio)
-                    desired_aspect_ratio = 0.75  # You can adjust this value
-
-                    # Calculate the new width based on the standard height and desired aspect ratio
-                    new_width = int(standard_height / desired_aspect_ratio)
-
-                    # Resize the image to the new dimensions (standard_height x new_width)
-                    img = img.resize((new_width, standard_height), Image.ANTIALIAS)
-
-                    temp_image_path = os.path.join(output_folder, 'temp_image.jpg')
-                    img.save(temp_image_path, format='JPEG')
-                    doc.add_picture(temp_image_path)
-                    os.remove(temp_image_path)
-
-                elif filename.lower().endswith(('.doc', '.docx')):
-                    docx_content = Document(file_path)
-                    composer.append(docx_content)
-
-            except Exception as e:
-                print(f"Error processing {filename}: {e}")
-
-        output_path = os.path.join(output_folder, output_filename)
-        composer.save(output_path)
-        print(f"Document '{output_filename}' saved successfully in '{output_folder}'.")
+        time.sleep (2)
+        
 
 
 
@@ -2025,7 +2031,7 @@ class MainWindow( QMainWindow ):
             name = self.ui.lineEdit_new_doc_name.text ()
             name = name.strip ()
 
-            if len (name) > 1 :
+            if len (name) >= 1 :
                 output_filename = name + ".doc"
             else:
                 output_filename = 'output.doc'
@@ -2174,6 +2180,8 @@ class MainWindow( QMainWindow ):
         dlg.setStandardButtons ( QMessageBox.Ok )
         dlg.exec ()
 
+    
+
     ## NOTE - Close database
     def close_database ( self ):
         try:
@@ -2224,7 +2232,7 @@ class MainWindow( QMainWindow ):
             text_Found = False
             file_name_exists = False
 
-            print (" File name from subprocces ", file_name )
+            # print (" File name from subprocces ", file_name )
             command = [ "bypy", "search", file_name ]
             proc =  subprocess.Popen( command  , stdout=subprocess.PIPE )
             while True:
@@ -2495,8 +2503,8 @@ class ProgressDialog(QDialog):
 if __name__ == "__main__":
     try:
 
-        Database.open_db_connection ()
-        DatabaseRunning.open_connection ()
+        # Database.open_db_connection ()
+        # DatabaseRunning.open_connection ()
 
         # #  first check password exists in baidu or not
         #
@@ -2551,7 +2559,9 @@ if __name__ == "__main__":
 
             window = MainWindow()
             
-            window.close_database ()
+            Database.close_db_connection ()
+            DatabaseRunning.close_connection ()
+
             DB_MGM.download_db_file ()
             DB_MGM.download_db_running ()
 

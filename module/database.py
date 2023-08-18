@@ -5,9 +5,11 @@ from tinydb import TinyDB, Query , where
 db = TinyDB( './DB/db.json' )
 
 def open_db_connection ():
-    global db
+    global db ,dir_list_table 
     # path for db
     db = TinyDB( './DB/db.json' )
+    
+    dir_list_table  = db.table( 'dir_list' )
 
 def close_db_connection():
     global db

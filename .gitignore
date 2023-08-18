@@ -3,3 +3,9 @@
 *t.txt
 /test_doc/
 /temp_folder/
+*.jpg
+*gif
+*.doc 
+*.docx
+*.png
+*.html

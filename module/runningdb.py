@@ -1,4 +1,4 @@
-from tinydb import TinyDB, Query
+from tinydb import TinyDB, Query, where
 
 # Create a TinyDB instance for the running database
 running_db = TinyDB('./DB/running.json')
@@ -13,33 +13,55 @@ def close_connection ():
 
 
 
-def change_status(status, user_id):
-    # Check if the user is already in the database
-    Running = Query()
-    user_record = running_db.get(Running.user == user_id)
+def change_status ( given_status, given_user_id ):
 
-    if user_record is None:
-        # If the user is not in the database, add a new record
-        running_db.insert({'status': status, 'user': user_id})
-    elif user_record['user'] == user_id:
-        # If the user is in the database and matches the provided user_id, change the status
-        running_db.update({'status': status}, Running.user == user_id)
+    status_from = running_db.get(doc_id=1)["status"].strip()
+    user_id_from = running_db.get(doc_id=1)["user_id"].strip()
+
+    given_status = given_status.strip()
+    given_user_id = given_user_id.strip()
+
+    # print("From Database user_id_from *", user_id_from, "*\t status *", status_from,"*")
+    # print("From Given da user_id_from *", given_user_id, "*\t status *", given_status,"*")
+
+    status = "not started"
+    change_status = False
+    result = given_status
+
+    if status_from == "free":
+        running_db.update({'status': given_status, 'user_id': given_user_id},  doc_ids=[1])
+        status = "ok"
+        change_status = True
+
+    elif ( status_from == "running" ) and ( user_id_from == given_user_id ) :
+        running_db.update({'status': given_status, 'user_id': given_user_id},  doc_ids=[1])
+        status = "ok"
+        change_status = True
+
+    elif ( status_from == "running" ) and ( user_id_from != given_user_id ) :
+        status = "User ID does not matched with "
+        change_status = False
+
+    status_from = running_db.get(doc_id=1)["status"].strip()
+    json = { "status" : status, "expected_result": result, "original_result": status_from, "status_changed" : change_status }
+
+    return  json
+
+
 
 def is_database_in_use():
-    Running = Query()
-    user_record = running_db.get(Running.status == 'running')
+    status_from = running_db.get(doc_id=1)["status"].strip()
+    user_id_from = running_db.get(doc_id=1)["user_id"].strip()
 
-    if user_record is None:
-        return False, None  # Database is free
+    if status_from == "free":
+        return False, user_id_from  # Database is free
     else:
-        return True, user_record['user']  # Database is in use by user
+        return True, user_id_from  # Database is in use by user
+
 
 
 def get_user_id():
-    Running = Query()
-    user_record = running_db.get(Running.status == 'running')
+    
+    user_id_from = running_db.get(doc_id=1)["user_id"].strip()
 
-    if user_record is None:
-        return None  # No user is currently using the database
-    else:
-        return user_record['user']  # Return the user ID using the database
+    return user_id_from
